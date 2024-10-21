@@ -8,7 +8,7 @@ class Database {
           'localhost', 
           5432,   
           'Zcord', // Имя вашей базы данных
-          username: 'postgres', // Ваше имя пользователя
+          username: 'Zcord_user', // Ваше имя пользователя
           password: '1234567', // Ваш пароль
         );
 
