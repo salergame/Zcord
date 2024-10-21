@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'chat_page.dart'; // Импортируем новый файл с чатами
 
 void main() {
   runApp(const MyApp());
@@ -55,32 +56,51 @@ class _ZCordLoginPageState extends State<ZCordLoginPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
+            constraints: const BoxConstraints(maxWidth: 500), // Ширина блока
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A), // Темный фон для блока авторизации
+              borderRadius: BorderRadius.circular(12), // Скругление углов
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.redAccent.withOpacity(0.5), // Цвет тени
+                  spreadRadius: 5, // Распространение тени
+                  blurRadius: 15, // Размытие тени
+                  offset: const Offset(0, 4), // Смещение тени
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 30), // Уменьшенные отступы внутри контейнера
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/zcord_logo.png', // Вставка логотипа
-                  height: 100,
+                ClipOval(
+                  child: Image.asset(
+                    'assets/zcord_logo.png', // Вставка логотипа
+                    height: 100,
+                    width: 100, // Задаем ширину для кругового изображения
+                    fit: BoxFit.cover, // Заполнение круга
+                  ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15), // Уменьшенный отступ
                 const Text(
                   'Welcome back!',
                   style: TextStyle(
+                    fontFamily: 'YesevaOne', // Использование шрифта Yeseva One
                     color: Colors.red,
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5), // Уменьшенный отступ
                 const Text(
                   'We are so excited to see you again!',
                   style: TextStyle(
+                    fontFamily: 'YesevaOne', // Использование шрифта Yeseva One
                     color: Colors.redAccent,
                     fontSize: 16,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15), // Уменьшенный отступ
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -88,7 +108,7 @@ class _ZCordLoginPageState extends State<ZCordLoginPage> {
                   ),
                   style: const TextStyle(color: Colors.white),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5), // Уменьшенный отступ
                 TextField(
                   controller: _passwordController,
                   decoration: const InputDecoration(
@@ -97,7 +117,7 @@ class _ZCordLoginPageState extends State<ZCordLoginPage> {
                   obscureText: true,
                   style: const TextStyle(color: Colors.white),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15), // Уменьшенный отступ
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -113,7 +133,7 @@ class _ZCordLoginPageState extends State<ZCordLoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15), // Уменьшенный отступ
                 TextButton(
                   onPressed: () {
                     // Логика восстановления пароля
@@ -126,7 +146,7 @@ class _ZCordLoginPageState extends State<ZCordLoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5), // Уменьшенный отступ
                 TextButton(
                   onPressed: () {
                     // Логика регистрации
@@ -137,6 +157,24 @@ class _ZCordLoginPageState extends State<ZCordLoginPage> {
                       color: Colors.redAccent,
                       decoration: TextDecoration.underline,
                     ),
+                  ),
+                ),
+                const SizedBox(height: 15), // Уменьшенный отступ
+                ElevatedButton(
+                  onPressed: () {
+                    // Переход на страницу с чатами
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ChatPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                  child: const Text(
+                    'Go to Chat Page',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
               ],
