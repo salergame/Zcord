@@ -10,36 +10,41 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Discord Login',
+      title: 'ZCord Login',
       theme: ThemeData.dark().copyWith(
-        primaryColor: Colors.purple[800],
-        scaffoldBackgroundColor: const Color(0xFF36393F),
+        primaryColor: Colors.red[800],
+        scaffoldBackgroundColor: const Color(0xFF000000), // Фон в стиле логотипа
         textTheme: TextTheme(
-          bodyMedium: TextStyle(color: Colors.white.withOpacity(0.8)),
+          bodyMedium: TextStyle(color: Colors.red.withOpacity(0.8)),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF40444B),
+          fillColor: const Color(0xFF1A1A1A), // Фон для полей ввода
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide.none,
           ),
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+          hintStyle: TextStyle(color: Colors.red.withOpacity(0.6)),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red[800], // Кнопка того же цвета
+          ),
         ),
       ),
-      home: const DiscordLoginPage(),
+      home: const ZCordLoginPage(),
     );
   }
 }
 
-class DiscordLoginPage extends StatefulWidget {
-  const DiscordLoginPage({super.key});
+class ZCordLoginPage extends StatefulWidget {
+  const ZCordLoginPage({super.key});
 
   @override
-  State<DiscordLoginPage> createState() => _DiscordLoginPageState();
+  State<ZCordLoginPage> createState() => _ZCordLoginPageState();
 }
 
-class _DiscordLoginPageState extends State<DiscordLoginPage> {
+class _ZCordLoginPageState extends State<ZCordLoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -54,10 +59,15 @@ class _DiscordLoginPageState extends State<DiscordLoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Image.asset(
+                  'assets/zcord_logo.png', // Вставка логотипа
+                  height: 100,
+                ),
+                const SizedBox(height: 20),
                 const Text(
                   'Welcome back!',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.red,
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
@@ -66,7 +76,7 @@ class _DiscordLoginPageState extends State<DiscordLoginPage> {
                 const Text(
                   'We are so excited to see you again!',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: Colors.redAccent,
                     fontSize: 16,
                   ),
                 ),
@@ -96,7 +106,6 @@ class _DiscordLoginPageState extends State<DiscordLoginPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 15),
-                      backgroundColor: Colors.purple[800],
                     ),
                     child: const Text(
                       'Login',
@@ -112,7 +121,7 @@ class _DiscordLoginPageState extends State<DiscordLoginPage> {
                   child: const Text(
                     'Forgot your password?',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Colors.redAccent,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -125,7 +134,7 @@ class _DiscordLoginPageState extends State<DiscordLoginPage> {
                   child: const Text(
                     'Need an account? Register',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Colors.redAccent,
                       decoration: TextDecoration.underline,
                     ),
                   ),
