@@ -44,8 +44,24 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Z-cord'),
-        backgroundColor: const Color(0xFF2C2F33), // Discord-like dark color
+        backgroundColor: const Color(0xFF1B1C1E), // Made background darker
+        title: Row(
+          children: [
+            ClipOval(
+              child: Image.asset(
+                'assets/zcord_logo.png', // Logo
+                height: 40, // Logo size
+                width: 40, // Logo size
+                fit: BoxFit.cover, // Circle cropping
+              ),
+            ),
+            const SizedBox(width: 10), // Spacing between logo and text
+            const Text(
+              'ZCord', // App name
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
       body: Row(
         children: [
@@ -75,25 +91,50 @@ class ChannelList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF23272A),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101214), // Made background darker
+        border: Border.all(
+          color: Colors.redAccent, // Bright red border
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.redAccent.withOpacity(0.8), // Neon red glow
+            blurRadius: 10,
+            spreadRadius: 3,
+          ),
+        ],
+      ),
       child: ListView(
         children: const [
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Channels',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Divider(color: Colors.red),
           ListTile(
             title: Text(
               '# general',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.red),
             ),
           ),
           ListTile(
             title: Text(
               '# random',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.red),
             ),
           ),
           ListTile(
             title: Text(
               '# coding',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],
@@ -119,14 +160,27 @@ class ChatBox extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            color: const Color(0xFF36393F),
+            decoration: BoxDecoration(
+              color: const Color(0xFF191A1C), // Dark background for chat
+              border: Border.all(
+                color: Colors.redAccent, // Bright red border
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.redAccent.withOpacity(0.8),
+                  blurRadius: 10,
+                  spreadRadius: 3,
+                ),
+              ],
+            ),
             child: ListView.builder(
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(
                     messages[index],
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.red),
                   ),
                 );
               },
@@ -140,22 +194,25 @@ class ChatBox extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: messageController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.red),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF40444B),
+                    fillColor: const Color(0xFF0F1011), // Very dark background for input
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
+                      borderSide: BorderSide(
+                        color: Colors.redAccent, // Red border around input field
+                        width: 2,
+                      ),
                     ),
                     hintText: 'Type a message...',
-                    hintStyle: const TextStyle(color: Colors.white54),
+                    hintStyle: const TextStyle(color: Colors.red),
                   ),
                   onSubmitted: (value) => onSend(), // Send message when "Enter" is pressed
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.send, color: Colors.white),
+                icon: const Icon(Icons.send, color: Colors.red),
                 onPressed: onSend, // Send message when the button is clicked
               ),
             ],
@@ -170,25 +227,50 @@ class UserList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF2C2F33),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101214), // Dark background for user list
+        border: Border.all(
+          color: Colors.redAccent, // Bright red border
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.redAccent.withOpacity(0.8), // Neon red glow
+            blurRadius: 10,
+            spreadRadius: 3,
+          ),
+        ],
+      ),
       child: ListView(
         children: const [
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Users',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Divider(color: Colors.red),
           ListTile(
             title: Text(
               'User1',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.red),
             ),
           ),
           ListTile(
             title: Text(
               'User2',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.red),
             ),
           ),
           ListTile(
             title: Text(
               'User3',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],
