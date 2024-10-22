@@ -1,63 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences for local storage
 
-class ChatPage extends StatefulWidget {
+class ChatPage extends StatelessWidget {
   const ChatPage({Key? key}) : super(key: key);
-
-  @override
-  _ChatPageState createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> {
-  List<String> messages = [];
-  TextEditingController messageController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    loadMessages(); // Load messages when the app starts
-  }
-
-  Future<void> loadMessages() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      messages = prefs.getStringList('messages') ?? []; // Load saved messages or initialize empty list
-    });
-  }
-
-  Future<void> saveMessages() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('messages', messages); // Save messages to local storage
-  }
-
-  void sendMessage() {
-    if (messageController.text.isNotEmpty) {
-      setState(() {
-        messages.add('User1: ${messageController.text}');
-        messageController.clear(); // Clear the input field
-      });
-      saveMessages(); // Save the updated message list
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1B1C1E), // Made background darker
+        backgroundColor: const Color(0xFF1B1C1E), // Сделали цвет еще темнее
         title: Row(
           children: [
             ClipOval(
               child: Image.asset(
-                'assets/zcord_logo.png', // Logo
-                height: 40, // Logo size
-                width: 40, // Logo size
-                fit: BoxFit.cover, // Circle cropping
+                'assets/zcord_logo.png', // Ваш логотип
+                height: 40, // Размер логотипа
+                width: 40, // Размер логотипа
+                fit: BoxFit.cover, // Обрезка под круг
               ),
             ),
-            const SizedBox(width: 10), // Spacing between logo and text
+            const SizedBox(width: 10), // Отступ между логотипом и текстом
             const Text(
-              'ZCord', // App name
+              'ZCord', // Логотип приложения
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ],
@@ -71,11 +34,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           Expanded(
             flex: 5,
-            child: ChatBox(
-              messages: messages,
-              messageController: messageController,
-              onSend: sendMessage, // Pass the sendMessage function to handle message sending
-            ),
+            child: ChatBox(),
           ),
           Expanded(
             flex: 2,
@@ -92,14 +51,14 @@ class ChannelList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF101214), // Made background darker
+        color: const Color(0xFF101214), // Сделали фон еще темнее
         border: Border.all(
-          color: Colors.redAccent, // Bright red border
+          color: Colors.redAccent, // Ярко-красная обводка
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.redAccent.withOpacity(0.8), // Neon red glow
+            color: Colors.redAccent.withOpacity(0.8), // Красная тень для неонового эффекта
             blurRadius: 10,
             spreadRadius: 3,
           ),
@@ -144,16 +103,6 @@ class ChannelList extends StatelessWidget {
 }
 
 class ChatBox extends StatelessWidget {
-  final List<String> messages;
-  final TextEditingController messageController;
-  final VoidCallback onSend;
-
-  ChatBox({
-    required this.messages,
-    required this.messageController,
-    required this.onSend,
-  });
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -161,9 +110,9 @@ class ChatBox extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF191A1C), // Dark background for chat
+              color: const Color(0xFF191A1C), // Более темный фон для чата
               border: Border.all(
-                color: Colors.redAccent, // Bright red border
+                color: Colors.redAccent, // Ярко-красная обводка
                 width: 2,
               ),
               boxShadow: [
@@ -174,48 +123,42 @@ class ChatBox extends StatelessWidget {
                 ),
               ],
             ),
-            child: ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return ListTile(
+            child: ListView(
+              padding: const EdgeInsets.all(8.0),
+              children: const [
+                ListTile(
                   title: Text(
-                    messages[index],
-                    style: const TextStyle(color: Colors.red),
+                    'User1: Hello World!',
+                    style: TextStyle(color: Colors.red),
                   ),
-                );
-              },
+                ),
+                ListTile(
+                  title: Text(
+                    'User2: Hi there!',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: messageController,
-                  style: const TextStyle(color: Colors.red),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color(0xFF0F1011), // Very dark background for input
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Colors.redAccent, // Red border around input field
-                        width: 2,
-                      ),
-                    ),
-                    hintText: 'Type a message...',
-                    hintStyle: const TextStyle(color: Colors.red),
-                  ),
-                  onSubmitted: (value) => onSend(), // Send message when "Enter" is pressed
+          child: TextField(
+            style: const TextStyle(color: Colors.red),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color(0xFF0F1011), // Очень темный фон для ввода
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.redAccent, // Красная обводка вокруг поля ввода
+                  width: 2,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.send, color: Colors.red),
-                onPressed: onSend, // Send message when the button is clicked
-              ),
-            ],
+              hintText: 'Type a message...',
+              hintStyle: const TextStyle(color: Colors.red),
+            ),
           ),
         ),
       ],
@@ -228,14 +171,14 @@ class UserList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF101214), // Dark background for user list
+        color: const Color(0xFF101214), // Темный фон для списка пользователей
         border: Border.all(
-          color: Colors.redAccent, // Bright red border
+          color: Colors.redAccent, // Ярко-красная обводка
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.redAccent.withOpacity(0.8), // Neon red glow
+            color: Colors.redAccent.withOpacity(0.8), // Неоновое свечение
             blurRadius: 10,
             spreadRadius: 3,
           ),
