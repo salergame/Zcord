@@ -228,24 +228,6 @@ class _ZCordLoginPageState extends State<ZCordLoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 15), // Уменьшенное пространство
-                ElevatedButton(
-                  onPressed: () {
-                    // Переход на страницу чата
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ChatPage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    backgroundColor: Colors.redAccent,
-                  ),
-                  child: Text(
-                    tr('go_to_chat'),
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
               ],
             ),
           ),
