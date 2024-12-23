@@ -10,12 +10,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  firebase_core: ^13.29.1
   flutter_localizations:
     sdk: flutter
   easy_localization: ^3.0.0
   postgres: ^2.3.0
   http: ^0.13.5
   cupertino_icons: ^1.0.8
+  
 
 dev_dependencies:
   flutter_test:
