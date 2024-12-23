@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatelessWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +47,8 @@ class ChatPage extends StatelessWidget {
 }
 
 class ChannelList extends StatelessWidget {
+  const ChannelList({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -103,6 +105,8 @@ class ChannelList extends StatelessWidget {
 }
 
 class ChatBox extends StatelessWidget {
+  const ChatBox({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -151,7 +155,7 @@ class ChatBox extends StatelessWidget {
               fillColor: const Color(0xFF0F1011), // Очень темный фон для ввода
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.redAccent, // Красная обводка вокруг поля ввода
                   width: 2,
                 ),
@@ -167,6 +171,8 @@ class ChatBox extends StatelessWidget {
 }
 
 class UserList extends StatelessWidget {
+  const UserList({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(

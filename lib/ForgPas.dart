@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ForgPas extends StatefulWidget {
@@ -11,8 +12,7 @@ class _ForgPasState extends State<ForgPas> {
   final TextEditingController _emailController = TextEditingController();
   String? _errorMessage;
 
-  void _sendResetLink() {
-    // Проверка, что поле не пустое
+  Future<void> _sendResetLink() async {
     if (_emailController.text.isEmpty) {
       setState(() {
         _errorMessage = 'Email cannot be empty.';
@@ -20,20 +20,27 @@ class _ForgPasState extends State<ForgPas> {
       return;
     }
 
-    // Здесь можно добавить логику для отправки ссылки на сброс пароля
-    // Например, отправить запрос на сервер
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text,
+      );
 
-    setState(() {
-      _errorMessage = null; // Очистить сообщение об ошибке
-    });
+      setState(() {
+        _errorMessage = null;
+      });
 
-    // Вывод сообщения об успешной отправке ссылки
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Reset link sent to ${_emailController.text}')),
-    );
+      // Вывод сообщения об успешной отправке ссылки
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reset link sent to ${_emailController.text}')),
+      );
 
-    // Очистка поля
-    _emailController.clear();
+      // Очистка поля
+      _emailController.clear();
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   @override
@@ -125,8 +132,7 @@ class _ForgPasState extends State<ForgPas> {
                 const SizedBox(height: 15),
                 TextButton(
                   onPressed: () {
-                    // Переход на страницу входа
-                    Navigator.pop(context); // Возвращаемся назад
+                    Navigator.pop(context); // Переход назад
                   },
                   child: const Text(
                     'Remembered your password? Login',
