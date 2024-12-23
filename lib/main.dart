@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'chat_page.dart'; // Import chat page
-import 'ForgPas.dart';
-import 'reg.dart'; // Import registration page
+import 'chat_page.dart'; // Импорт страницы чата
+import 'ForgPas.dart'; // Импорт страницы восстановления пароля
+import 'reg.dart'; // Импорт страницы регистрации
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Инициализация Firebase
   await EasyLocalization.ensureInitialized();
 
   runApp(EasyLocalization(
     supportedLocales: const [Locale('en'), Locale('ru')],
-    path: 'assets/lang', // Path to translation files
+    path: 'assets/lang', // Путь к файлам перевода
     fallbackLocale: const Locale('en'),
     child: const MyApp(),
   ));
@@ -52,13 +55,44 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
       locale: context.locale,
-      home: ZCordLoginPage(),
+      home: const ZCordLoginPage(), // Страница авторизации
     );
   }
 }
 
-class ZCordLoginPage extends StatelessWidget {
+class ZCordLoginPage extends StatefulWidget {
   const ZCordLoginPage({super.key});
+
+  @override
+  _ZCordLoginPageState createState() => _ZCordLoginPageState();
+}
+
+class _ZCordLoginPageState extends State<ZCordLoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  void _signIn() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      // Переход на страницу чата после успешной авторизации
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ChatPage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      // Обработка ошибок
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +164,7 @@ class ZCordLoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
                 TextField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     hintText: tr('email_or_phone'),
                   ),
@@ -137,6 +172,7 @@ class ZCordLoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 TextField(
+                  controller: _passwordController,
                   decoration: InputDecoration(
                     hintText: tr('password'),
                   ),
@@ -147,9 +183,7 @@ class ZCordLoginPage extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Handle login logic
-                    },
+                    onPressed: _signIn, // Вызов аутентификации
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
@@ -162,7 +196,7 @@ class ZCordLoginPage extends StatelessWidget {
                 const SizedBox(height: 15),
                 TextButton(
                   onPressed: () {
-                    // Navigate to Forgot Password page
+                    // Переход на страницу восстановления пароля
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const ForgPas()),
@@ -179,7 +213,7 @@ class ZCordLoginPage extends StatelessWidget {
                 const SizedBox(height: 5),
                 TextButton(
                   onPressed: () {
-                    // Navigate to Registration page
+                    // Переход на страницу регистрации
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -194,10 +228,10 @@ class ZCordLoginPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 15), // Reduced space
+                const SizedBox(height: 15), // Уменьшенное пространство
                 ElevatedButton(
                   onPressed: () {
-                    // Navigate to Chat Page
+                    // Переход на страницу чата
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const ChatPage()),
