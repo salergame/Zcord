@@ -220,4 +220,3 @@ class ZCordLoginPage extends StatelessWidget {
     );
   }
 }
-
