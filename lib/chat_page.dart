@@ -26,7 +26,7 @@ class ChatPage extends StatelessWidget {
           ],
         ),
       ),
-      body: Row(
+      body: const Row(
         children: [
           Expanded(
             flex: 2,
