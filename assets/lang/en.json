@@ -9,5 +9,9 @@
   "go_to_chat": "Go to Chat Page",
   "error": "Error",
   "ok": "Continue",
-  "invalid_credentials": "Invalid email or password."
+  "no_user_found": "No user found for that email.",
+  "wrong_password": "Wrong password provided for that user.",
+  "invalid_email": "The email address is not valid.",
+  "network_error": "Network error occurred. Please try again.",
+  "unexpected_error": "An unexpected error occurred. Please try again later."
 }

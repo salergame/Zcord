@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'discord_loading_animation.dart';
+import 'discord_loading_animation.dart'; // импорт загрузки дискорда
 import 'chat_page.dart'; // Импорт страницы чата
 import 'forgot_password.dart'; // Импорт страницы восстановления пароля
 import 'reg.dart'; // Импорт страницы регистрации
@@ -84,12 +84,12 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
     try {
       // Try to sign in the user with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
 
       // Close the loading animation dialog after successful login
-      if (!mounted) return;  // Check if the widget is still mounted
+      if (!mounted) return; // Check if the widget is still mounted
       Navigator.pop(context);
 
       // Check if the user is authenticated
@@ -103,32 +103,43 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
       }
     } on FirebaseAuthException catch (e) {
       // Close the loading animation dialog in case of error
-      if (!mounted) return;  // Check if the widget is still mounted
+      if (!mounted) return; // Check if the widget is still mounted
       Navigator.pop(context);
-
-      // Handle different types of errors
-      if (e.code == 'user-not-found') {
-        _showErrorDialog('No user found for that email.');
+// TODO: настроить уведомления которые соотвествуют ошибкам
+      if (e.code == 'invalid_credentials') {
+        _showErrorDialog(tr('invalid_credentials'));
       } else if (e.code == 'wrong-password') {
-        _showErrorDialog('Wrong password provided for that user.');
+        _showErrorDialog(tr('wrong_password'));
+      } else if (e.code == 'invalid-email') {
+        _showErrorDialog(tr('invalid_email'));
+      } else if (e.code == 'network-request-failed') {
+        _showErrorDialog(tr('network_error'));
+      } else {
+        _showErrorDialog(tr('unexpected_error'));
       }
+    } catch (e) {
+      // Handle unexpected errors
+      Navigator.pop(context);
+      _showErrorDialog(tr('unexpected_error'));
     }
   }
+
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Error'),
+        title: Text(tr('error')),
         content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),  // Close the dialog when "OK" is pressed
+            onPressed: () => Navigator.pop(context), // Close the dialog when "OK" is pressed
             child: const Text('OK'),
           ),
         ],
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
