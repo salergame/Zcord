@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1052939828410",
+    "project_id": "z-cord-50702",
+    "storage_bucket": "z-cord-50702.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052939828410:android:eced331d45ad03156a9683",
+        "android_client_info": {
+          "package_name": "com.example_zcord.zcor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZNaA4O1x19G0wVG1RDWkRdluRBhNxoik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052939828410:android:3a889e33dfd6cc826a9683",
+        "android_client_info": {
+          "package_name": "com.example_zcord.zcord"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZNaA4O1x19G0wVG1RDWkRdluRBhNxoik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,18 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ForgPas extends StatefulWidget {
-  const ForgPas({super.key});
+class ForgotPassword extends StatefulWidget {
+  const ForgotPassword({super.key});
 
   @override
-  State<ForgPas> createState() => _ForgPasState();
+  State<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
-class _ForgPasState extends State<ForgPas> {
+class _ForgotPasswordState extends State<ForgotPassword> {
   final TextEditingController _emailController = TextEditingController();
   String? _errorMessage;
 
-  void _sendResetLink() {
-    // Проверка, что поле не пустое
+  Future<void> _sendResetLink() async {
     if (_emailController.text.isEmpty) {
       setState(() {
         _errorMessage = 'Email cannot be empty.';
@@ -20,20 +20,31 @@ class _ForgPasState extends State<ForgPas> {
       return;
     }
 
-    // Здесь можно добавить логику для отправки ссылки на сброс пароля
-    // Например, отправить запрос на сервер
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text,
+      );
 
-    setState(() {
-      _errorMessage = null; // Очистить сообщение об ошибке
-    });
+      if (!mounted) return;  // Check if the widget is still mounted
 
-    // Вывод сообщения об успешной отправке ссылки
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Reset link sent to ${_emailController.text}')),
-    );
+      setState(() {
+        _errorMessage = null;
+      });
 
-    // Очистка поля
-    _emailController.clear();
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reset link sent to ${_emailController.text}')),
+      );
+
+      // Clear the email field
+      _emailController.clear();
+    } catch (e) {
+      if (!mounted) return;  // Check if the widget is still mounted
+
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   @override
@@ -89,7 +100,7 @@ class _ForgPasState extends State<ForgPas> {
                 ),
                 const SizedBox(height: 15),
 
-                // Поле для ввода email
+                // Email input field
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -99,7 +110,7 @@ class _ForgPasState extends State<ForgPas> {
                 ),
                 const SizedBox(height: 15),
 
-                // Отображение сообщения об ошибке
+                // Display error message if any
                 if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
@@ -125,8 +136,7 @@ class _ForgPasState extends State<ForgPas> {
                 const SizedBox(height: 15),
                 TextButton(
                   onPressed: () {
-                    // Переход на страницу входа
-                    Navigator.pop(context); // Возвращаемся назад
+                    Navigator.pop(context); // Navigate back
                   },
                   child: const Text(
                     'Remembered your password? Login',

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(Discordloadinganimation());
+  runApp(const DiscordLoadingAnimationApp());
 }
 
-class Discordloadinganimation extends StatelessWidget {
+class DiscordLoadingAnimationApp extends StatelessWidget {
+  const DiscordLoadingAnimationApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: FirstPage(),
       debugShowCheckedModeBanner: false,
     );
@@ -15,29 +17,31 @@ class Discordloadinganimation extends StatelessWidget {
 }
 
 class FirstPage extends StatelessWidget {
+  const FirstPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Первая страница')),
+      appBar: AppBar(title: const Text('Первая страница')),
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
-            // Показать анимацию загрузки
+            // Show loading animation
             await Navigator.of(context).push(PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  SecondPage(),
+              const SecondPage(),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return Stack(
                   children: [
                     FadeTransition(opacity: animation, child: child),
                     if (animation.status != AnimationStatus.completed)
-                      Center(child: DiscordLoadingAnimation()),
+                      const Center(child: DiscordLoadingAnimation()),  // const constructor used
                   ],
                 );
               },
             ));
           },
-          child: Text('Перейти на вторую страницу'),
+          child: const Text('Перейти на вторую страницу'),
         ),
       ),
     );
@@ -45,11 +49,13 @@ class FirstPage extends StatelessWidget {
 }
 
 class SecondPage extends StatelessWidget {
+  const SecondPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Вторая страница')),
-      body: Center(
+      appBar: AppBar(title: const Text('Вторая страница')),
+      body: const Center(
         child: Text('Добро пожаловать на вторую страницу!'),
       ),
     );
@@ -57,12 +63,13 @@ class SecondPage extends StatelessWidget {
 }
 
 class DiscordLoadingAnimation extends StatefulWidget {
+  const DiscordLoadingAnimation({super.key});  // Added key parameter
+
   @override
-  _DiscordLoadingAnimationState createState() =>
-      _DiscordLoadingAnimationState();
+  DiscordLoadingAnimationState createState() => DiscordLoadingAnimationState();
 }
 
-class _DiscordLoadingAnimationState extends State<DiscordLoadingAnimation>
+class DiscordLoadingAnimationState extends State<DiscordLoadingAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -94,7 +101,7 @@ class _DiscordLoadingAnimationState extends State<DiscordLoadingAnimation>
               scale: 1.0 + 0.2 * _animation.value * ((index % 2) == 0 ? 1 : -1),
               child: Opacity(
                 opacity: 0.5 + 0.5 * (1 - _animation.value),
-                child: CircleAvatar(
+                child: const CircleAvatar(
                   radius: 8.0,
                   backgroundColor: Colors.blue,
                 ),

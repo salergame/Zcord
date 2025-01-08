@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatelessWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: const HomePage(),
       theme: ThemeData.dark(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() {
+    return HomePageState();
+  }
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    MessagesPage(),
-    NotificationsPage(),
-    SettingsPage(),
+    const MessagesPage(),
+    const NotificationsPage(),
+    const SettingsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -43,16 +47,16 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.white,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: [
-          const BottomNavigationBarItem(
+        items: const [
+          BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Главная',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
             label: 'Уведомления',
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Вы',
           ),
@@ -63,6 +67,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MessagesPage extends StatelessWidget {
+  const MessagesPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,6 +190,7 @@ class MessagesPage extends StatelessWidget {
 }
 
 class NotificationsPage extends StatelessWidget {
+  const NotificationsPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,7 +217,7 @@ class NotificationsPage extends StatelessWidget {
             title: 'Stitch',
             subtitle: 'упоминает вас в Elysium',
             time: '14 ч.',
-            message: "- Фрагменты будут из различных аниме. Заявки будут приниматься прямо на трибуне. Вы сможете прописать voiceacting в специально отведенном канале - заявки.",
+            message: "- Фрагменты будут из различных аниме. Заявки будут приниматься прямо на трибуне. Вы сможете прописать voice acting в специально отведенном канале - заявки.",
           ),
            NotificationItem(
             avatarUrl: 'https://placehold.co/50x50',
@@ -234,6 +240,7 @@ class NotificationItem extends StatelessWidget {
   final String message;
 
   const NotificationItem({
+    super.key,
     required this.avatarUrl,
     required this.title,
     required this.subtitle,
@@ -300,6 +307,7 @@ class NotificationItem extends StatelessWidget {
 }
 
 class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -403,7 +411,7 @@ class SettingsPage extends StatelessWidget {
 class SectionHeader extends StatelessWidget {
   final String title;
 
-  const SectionHeader({required this.title});
+  const SectionHeader({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -425,7 +433,7 @@ class SettingsItem extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
 
-  const SettingsItem({
+  const SettingsItem({super.key,
     required this.icon,
     required this.title,
     required this.onTap,
