@@ -1,4 +1,6 @@
-  import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'chat_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -14,8 +16,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _confirmPasswordController = TextEditingController();
   String? _errorMessage;
 
-  void _register() {
-    // Проверка полей
+  void _register() async {
     if (_usernameController.text.isEmpty) {
       setState(() {
         _errorMessage = 'Username cannot be empty.';
@@ -41,22 +42,32 @@ class _RegistrationPageState extends State<RegistrationPage> {
       return;
     }
 
-    // Если все проверки пройдены, можно добавить логику регистрации
-    // Например, отправить данные на сервер или сохранить локально
-    setState(() {
-      _errorMessage = null; // Очистить сообщение об ошибке
-    });
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
 
-    // Вывод сообщения об успешной регистрации или переход на другую страницу
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Registration successful for ${_usernameController.text}')),
-    );
+      setState(() {
+        _errorMessage = null;
+      });
 
-    // Очистка полей
-    _usernameController.clear();
-    _emailController.clear();
-    _passwordController.clear();
-    _confirmPasswordController.clear();
+      // Очистка полей
+      _usernameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _confirmPasswordController.clear();
+
+      // Переход на экран чата
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ChatPage()),
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   @override
@@ -111,8 +122,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                 ),
                 const SizedBox(height: 15),
-
-                // Поле для ввода логина
                 TextField(
                   controller: _usernameController,
                   decoration: const InputDecoration(
@@ -121,8 +130,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 5),
-
-                // Поле для ввода email
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -131,8 +138,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 5),
-
-                // Поле для ввода пароля
                 TextField(
                   controller: _passwordController,
                   decoration: const InputDecoration(
@@ -142,8 +147,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 5),
-
-                // Поле для подтверждения пароля
                 TextField(
                   controller: _confirmPasswordController,
                   decoration: const InputDecoration(
@@ -153,8 +156,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 15),
-
-                // Отображение сообщения об ошибке
                 if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
@@ -163,7 +164,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -180,8 +180,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 15),
                 TextButton(
                   onPressed: () {
-                    // Переход на страницу входа
-                    Navigator.pop(context); // Возвращаемся назад
+                    Navigator.pop(context);
                   },
                   child: const Text(
                     'Already have an account? Login',
