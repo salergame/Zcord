@@ -38,21 +38,21 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF2D3748),
+        backgroundColor: const Color(0xFF2D3748),
         selectedItemColor: Colors.red,
         unselectedItemColor: Colors.white,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Главная',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
             label: 'Уведомления',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Вы',
           ),
@@ -71,18 +71,18 @@ class MessagesPage extends StatelessWidget {
           // Sidebar
           Container(
             width: 60,
-            color: Color(0xFF1a202c),
+            color: const Color(0xFF1a202c),
             child: Column(
               children: [
-                SizedBox(height: 16),
-                CircleAvatar(
+                const SizedBox(height: 16),
+                const CircleAvatar(
                   backgroundImage: AssetImage('assets/Z.png'),
                   radius: 20,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 for (int i = 0; i < 7; i++)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: CircleAvatar(
                       backgroundImage: NetworkImage(
                         'https://storage.googleapis.com/a1aa/image/DEQoePJ5qpXxJiMN9lRz3WzNyBUOMj0fSNYdsPwVA9PGqx5TA.jpg',
@@ -90,11 +90,11 @@ class MessagesPage extends StatelessWidget {
                       radius: 20,
                     ),
                   ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 FloatingActionButton(
                   onPressed: () {},
                   backgroundColor: Colors.grey[700],
-                  child: Icon(Icons.add, color: Colors.white),
+                  child: const Icon(Icons.add, color: Colors.white),
                 ),
               ],
             ),
@@ -105,11 +105,11 @@ class MessagesPage extends StatelessWidget {
               children: [
                 // Header
                 Container(
-                  color: Color(0xFF2d3748),
-                  padding: EdgeInsets.all(16),
+                  color: const Color(0xFF2d3748),
+                  padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: Text(
                           'Messages',
                           style: TextStyle(
@@ -122,13 +122,13 @@ class MessagesPage extends StatelessWidget {
                         child: TextField(
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: Color(0xFF4a5568),
+                            fillColor: const Color(0xFF4a5568),
                             hintText: 'Search...',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.search, color: Colors.white),
+                            prefixIcon: const Icon(Icons.search, color: Colors.white),
                           ),
                         ),
                       ),
@@ -138,11 +138,11 @@ class MessagesPage extends StatelessWidget {
                 // Messages List
                 Expanded(
                   child: ListView.builder(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     itemCount: 10,
                     itemBuilder: (context, index) {
                       return Card(
-                        color: Color(0xFF2d3748),
+                        color: const Color(0xFF2d3748),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -156,7 +156,7 @@ class MessagesPage extends StatelessWidget {
                           ),
                           title: Text(
                             index % 2 == 0 ? 'Group ${index + 1}' : 'User ${index + 1}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
                             index % 2 == 0
@@ -178,7 +178,7 @@ class MessagesPage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.red,
-        child: Icon(Icons.person_add, color: Colors.white),
+        child: const Icon(Icons.person_add, color: Colors.white),
       ),
     );
   }
@@ -197,23 +197,23 @@ class NotificationsPage extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: EdgeInsets.all(16),
-        children: [
-          NotificationItem(
+        padding: const EdgeInsets.all(16),
+        children: const [
+           NotificationItem(
             avatarUrl: 'https://placehold.co/50x50',
             title: 'Черный [90]',
             subtitle: 'упоминает вас в STALKER NEW STORY [CLEAR SKY]',
             time: '45 мин.',
             message: "Хлопцы, я тут на деревню заглянул привез немного своего хабара, ну там патроны, расходники. Подкатывайте посмотрите может кому, что надо. Можем и поторговать. Ааа чуть не забыл, если чет есть продать можем и договорится. Куплю камишки всякие интересные и снарягу, если конечно м...",
           ),
-          NotificationItem(
+           NotificationItem(
             avatarUrl: 'https://placehold.co/50x50',
             title: 'Stitch',
             subtitle: 'упоминает вас в Elysium',
             time: '14 ч.',
             message: "- Фрагменты будут из различных аниме. Заявки будут приниматься прямо на трибуне. Вы сможете прописать voiceacting в специально отведенном канале - заявки.",
           ),
-          NotificationItem(
+           NotificationItem(
             avatarUrl: 'https://placehold.co/50x50',
             title: 'Черный [90]',
             subtitle: 'упоминает вас в STALKER NEW STORY [CLEAR SKY]',
@@ -244,10 +244,10 @@ class NotificationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      padding: EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Color(0xFF4A5568),
+        color: const Color(0xFF4A5568),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -257,35 +257,35 @@ class NotificationItem extends StatelessWidget {
             backgroundImage: NetworkImage(avatarUrl),
             radius: 24,
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white70,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   message,
-                  style: TextStyle(color: Colors.white60),
+                  style: const TextStyle(color: Colors.white60),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   time,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white38,
                     fontSize: 12,
                   ),
@@ -318,7 +318,7 @@ class SettingsPage extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -326,10 +326,10 @@ class SettingsPage extends StatelessWidget {
             TextField(
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Color(0xFF4A5568),
+                fillColor: const Color(0xFF4A5568),
                 hintText: 'Search',
                 hintStyle: TextStyle(color: Colors.red[500]),
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -337,9 +337,9 @@ class SettingsPage extends StatelessWidget {
               ),
               style: TextStyle(color: Colors.red[500]),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Account Settings Section
-            SectionHeader(title: 'Account Settings'),
+            const SectionHeader(title: 'Account Settings'),
             SettingsItem(
               icon: Icons.person,
               title: 'Account',
@@ -380,9 +380,9 @@ class SettingsPage extends StatelessWidget {
               title: 'Scan QR Code',
               onTap: () {},
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Billing Settings Section
-            SectionHeader(title: 'Billing Settings'),
+            const SectionHeader(title: 'Billing Settings'),
             SettingsItem(
               icon: Icons.rocket,
               title: 'Manage Nitro',
@@ -411,7 +411,7 @@ class SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.grey,
           fontWeight: FontWeight.bold,
         ),
@@ -436,10 +436,10 @@ class SettingsItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8),
-        padding: EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Color(0xFF4A5568),
+          color: const Color(0xFF4A5568),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -448,14 +448,14 @@ class SettingsItem extends StatelessWidget {
             Row(
               children: [
                 Icon(icon, color: Colors.red[500]),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Text(
                   title,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
-            Icon(Icons.chevron_right, color: Colors.grey),
+            const Icon(Icons.chevron_right, color: Colors.grey),
           ],
         ),
       ),

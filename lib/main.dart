@@ -52,13 +52,33 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
       locale: context.locale,
-      home: ZCordLoginPage(),
+      home: const ZCordLoginPage(),
     );
   }
 }
 
 class ZCordLoginPage extends StatelessWidget {
   const ZCordLoginPage({super.key});
+
+  void _showErrorDialog(BuildContext context, String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(tr('error')),
+          content: Text(errorMessage),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(tr('ok')),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +168,21 @@ class ZCordLoginPage extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle login logic
+                      // Simulate login logic
+                      bool isValid = false; // Replace with actual validation logic
+                      if (!isValid) {
+                        _showErrorDialog(
+                          context,
+                          tr('invalid_credentials'),
+                        );
+                      } else {
+                        // Navigate to Chat Page if valid
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ChatPage()),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 15),
