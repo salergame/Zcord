@@ -1,5 +1,5 @@
 name: zcord
-description: "A new Flutter project."
+description: "Discord analog"
 publish_to: 'none' # Удалите эту строку, если хотите опубликовать на pub.dev
 
 version: 1.0.0+1
@@ -18,11 +18,14 @@ dependencies:
   http: ^1.2.2
   cupertino_icons: ^1.0.8
   awesome_dialog: ^3.2.1
+  cloud_firestore: ^5.6.1
+  shared_preferences: ^2.3.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+
 
 flutter:
   uses-material-design: true

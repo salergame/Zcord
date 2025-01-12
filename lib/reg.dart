@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'chat_page.dart';
@@ -17,76 +18,84 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String? _errorMessage;
 
   void _register() async {
-    if (_usernameController.text.isEmpty) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Username cannot be empty.';
-        });
-      }
+    final navigator = Navigator.of(context); // Cache the Navigator reference
+    final username = _usernameController.text;
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (username.isEmpty) {
+      setState(() {
+        _errorMessage = 'Username cannot be empty.';
+      });
       return;
     }
-    if (_emailController.text.isEmpty) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Email cannot be empty.';
-        });
-      }
+    if (email.isEmpty) {
+      setState(() {
+        _errorMessage = 'Email cannot be empty.';
+      });
       return;
     }
-    if (_passwordController.text.isEmpty) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Password cannot be empty.';
-        });
-      }
+    if (password.isEmpty) {
+      setState(() {
+        _errorMessage = 'Password cannot be empty.';
+      });
       return;
     }
-    if (_passwordController.text != _confirmPasswordController.text) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Passwords do not match.';
-        });
-      }
+    if (password != confirmPassword) {
+      setState(() {
+        _errorMessage = 'Passwords do not match.';
+      });
       return;
     }
 
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: email,
+        password: password,
       );
 
-      if (mounted) {
-        setState(() {
-          _errorMessage = null;
-        });
-      }
+      setState(() {
+        _errorMessage = null;
+      });
 
-      // Очистка полей
       _usernameController.clear();
       _emailController.clear();
       _passwordController.clear();
       _confirmPasswordController.clear();
 
-      // Переход на экран чата
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const ChatPage()),
-        );
-      }
+      // Navigate using cached Navigator reference
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const ChatPage()),
+      );
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = e.toString();
-        });
-      }
+      setState(() {
+        _errorMessage = e.toString();
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('ZCord'),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.language),
+            onSelected: (String languageCode) {
+              // Assuming context.setLocale is defined elsewhere in your app.
+              context.setLocale(Locale(languageCode));
+            },
+            itemBuilder: (BuildContext context) {
+              return const [
+                PopupMenuItem(value: 'en', child: Text('English')),
+                PopupMenuItem(value: 'ru', child: Text('Русский')),
+              ];
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
