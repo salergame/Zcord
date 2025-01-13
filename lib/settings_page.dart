@@ -1,23 +1,35 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'main.dart';
+import 'settings_page/account_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.red[500]),
-          onPressed: () {
-            // Handle navigation
-          },
-        ),
         title: Text(
           'Настройки',
           style: TextStyle(color: Colors.red[500]),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white), // Logout Icon
+            onPressed: () async {
+              // Firebase logout
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const Zcord()),
+                    (route) => false, // Clear navigation stack
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -45,7 +57,12 @@ class SettingsPage extends StatelessWidget {
             SettingsItem(
               icon: Icons.person,
               title: 'Аккаунт',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AccountPage()),
+                );
+              },
             ),
             SettingsItem(
               icon: Icons.shield,

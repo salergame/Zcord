@@ -2,32 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'discord_loading_animation.dart'; // импорт загрузки дискорда
-import 'chat_page.dart'; // Импорт страницы чата
-import 'forgot_password.dart'; // Импорт страницы восстановления пароля
-import 'reg.dart'; // Импорт страницы регистрации
+import 'discord_loading_animation.dart'; // Import the loading animation widget
+import 'chat_page.dart'; // Import chat page
+import 'forgot_password.dart'; // Import forgot password page
+import 'reg.dart'; // Import registration page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Инициализация Firebase
+  await Firebase.initializeApp(); // Initialize Firebase
   await EasyLocalization.ensureInitialized();
 
   runApp(EasyLocalization(
     supportedLocales: const [Locale('en'), Locale('ru')],
-    path: 'assets/lang', // Путь к файлам перевода
+    path: 'assets/lang', // Path to translation files
     fallbackLocale: const Locale('en'),
-    child: const MyApp(),
+    child: const Zcord(),
   ));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class Zcord extends StatefulWidget {
+  const Zcord({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<Zcord> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<Zcord> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
       locale: context.locale,
-      home: const ZCordLoginPage(), // Страница авторизации
+      home: const ZCordLoginPage(), // Login page as the home page
     );
   }
 }
@@ -79,35 +79,36 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
     showDialog(
       context: context,
       builder: (context) => const Center(child: DiscordLoadingAnimation()),
+      barrierDismissible: false, // Prevent dismissing the dialog manually
     );
 
     try {
-      // Try to sign in the user with email and password
+      // Attempt to sign in the user
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Close the loading animation dialog after successful login
-      if (!mounted) return; // Check if the widget is still mounted
+      // Close the loading dialog
+      if (!mounted) return;
       Navigator.pop(context);
 
-      // Check if the user is authenticated
+      // Navigate to the chat page upon successful login
       if (userCredential.user != null) {
-        // Navigate to the chat page after successful login
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const ChatPage()),
-              (route) => false, // Remove all the previous routes
+              (route) => false, // Remove all previous routes
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Close the loading animation dialog in case of error
-      if (!mounted) return; // Check if the widget is still mounted
+      // Close the loading dialog in case of error
+      if (!mounted) return;
       Navigator.pop(context);
-// TODO: настроить уведомления которые соотвествуют ошибкам
-      if (e.code == 'invalid_credentials') {
-        _showErrorDialog(tr('invalid_credentials'));
+
+      // Display appropriate error messages
+      if (e.code == 'user-not-found') {
+        _showErrorDialog(tr('user_not_found'));
       } else if (e.code == 'wrong-password') {
         _showErrorDialog(tr('wrong_password'));
       } else if (e.code == 'invalid-email') {
@@ -119,7 +120,8 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
       }
     } catch (e) {
       // Handle unexpected errors
-      Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context); // Dismiss the dialog
       _showErrorDialog(tr('unexpected_error'));
     }
   }
@@ -132,14 +134,13 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
         content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // Close the dialog when "OK" is pressed
+            onPressed: () => Navigator.pop(context), // Close the dialog
             child: const Text('OK'),
           ),
         ],
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -230,7 +231,7 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _signIn, // Вызов аутентификации
+                    onPressed: _signIn,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
@@ -243,7 +244,6 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
                 const SizedBox(height: 15),
                 TextButton(
                   onPressed: () {
-                    // Переход на страницу восстановления пароля
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const ForgotPassword()),
@@ -260,7 +260,6 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
                 const SizedBox(height: 5),
                 TextButton(
                   onPressed: () {
-                    // Переход на страницу регистрации
                     Navigator.push(
                       context,
                       MaterialPageRoute(
