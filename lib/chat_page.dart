@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'notifications_page.dart';
 import 'settings_page.dart';
-import 'create_chat_page.dart'; // Import the CreateChatPage
+import 'create_chat_page.dart'; // Import the new CreateChatPage
 
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
@@ -70,24 +70,8 @@ class HomePageState extends State<HomePage> {
   }
 }
 
-class MessagesListPage extends StatefulWidget {
+class MessagesListPage extends StatelessWidget {
   const MessagesListPage({super.key});
-
-  @override
-  State<MessagesListPage> createState() => _MessagesListPageState();
-}
-
-class _MessagesListPageState extends State<MessagesListPage> {
-  final List<Map<String, String>> _chats = [
-    {'id': 'group_1', 'title': 'Group 1', 'type': 'group'},
-    {'id': 'user_2', 'title': 'User 2', 'type': 'user'},
-  ];
-
-  void _addChat(String id, String title, String type) {
-    setState(() {
-      _chats.add({'id': id, 'title': title, 'type': type});
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +106,7 @@ class _MessagesListPageState extends State<MessagesListPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CreateChatPage(onCreateChat: _addChat),
+                        builder: (context) => const CreateChatPage(),
                       ),
                     );
                   },
@@ -170,12 +154,11 @@ class _MessagesListPageState extends State<MessagesListPage> {
                 ),
                 // Messages List
                 Expanded(
-                  child: ListView.builder(
+                  child: ListView(
                     padding: const EdgeInsets.all(8),
-                    itemCount: _chats.length,
-                    itemBuilder: (context, index) {
-                      final chat = _chats[index];
-                      return Card(
+                    children: [
+                      // Group 1
+                      Card(
                         color: const Color(0xFF2d3748),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -185,40 +168,82 @@ class _MessagesListPageState extends State<MessagesListPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MessagesPage(
-                                  chatId: chat['id']!,
-                                  title: chat['title']!,
+                                builder: (context) => const MessagesPage(
+                                  chatId: 'group_1',
+                                  title: 'Group 1',
                                 ),
                               ),
                             );
                           },
-                          leading: CircleAvatar(
+                          leading: const CircleAvatar(
                             backgroundImage: NetworkImage(
-                              chat['type'] == 'group'
-                                  ? 'https://storage.googleapis.com/a1aa/image/EYKK0hAYWErCGltuUVoYkhoYjfQDslTNLKpS8yO9Yu8D148JA.jpg'
-                                  : 'https://storage.googleapis.com/a1aa/image/DEQoePJ5qpXxJiMN9lRz3WzNyBUOMj0fSNYdsPwVA9PGqx5TA.jpg',
+                              'https://storage.googleapis.com/a1aa/image/EYKK0hAYWErCGltuUVoYkhoYjfQDslTNLKpS8yO9Yu8D148JA.jpg',
                             ),
                           ),
-                          title: Text(
-                            chat['title']!,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          title: const Text(
+                            'Group 1',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text(
-                            chat['type'] == 'group'
-                                ? 'Last message from group'
-                                : 'Last message from user',
+                          subtitle: const Text(
+                            'Last message from group',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      );
-                    },
+                      ),
+                      // User 2
+                      Card(
+                        color: const Color(0xFF2d3748),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MessagesPage(
+                                  chatId: 'user_2',
+                                  title: 'User 2',
+                                ),
+                              ),
+                            );
+                          },
+                          leading: const CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              'https://storage.googleapis.com/a1aa/image/DEQoePJ5qpXxJiMN9lRz3WzNyBUOMj0fSNYdsPwVA9PGqx5TA.jpg',
+                            ),
+                          ),
+                          title: const Text(
+                            'User 2',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            'Last message from user',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateChatPage(),
+            ),
+          );
+        },
+        backgroundColor: Colors.red,
+        child: const Icon(Icons.person_add, color: Colors.white),
       ),
     );
   }

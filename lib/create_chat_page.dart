@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CreateChatPage extends StatefulWidget {
-  final Function(String id, String title, String type) onCreateChat;
-
-  const CreateChatPage({super.key, required this.onCreateChat});
+  const CreateChatPage({super.key});
 
   @override
   State<CreateChatPage> createState() => _CreateChatPageState();
@@ -11,13 +10,24 @@ class CreateChatPage extends StatefulWidget {
 
 class _CreateChatPageState extends State<CreateChatPage> {
   final TextEditingController _nameController = TextEditingController();
-  bool _isGroup = true;
+  bool _isGroup = false;
 
-  void _createChat() {
+  void _createChat() async {
     final chatName = _nameController.text.trim();
     if (chatName.isNotEmpty) {
-      final id = '${_isGroup ? 'group' : 'server'}_${DateTime.now().millisecondsSinceEpoch}';
-      widget.onCreateChat(id, chatName, _isGroup ? 'group' : 'server');
+      if (_isGroup) {
+        // Handle group creation
+        await FirebaseFirestore.instance.collection('groups').add({
+          'name': chatName,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Handle server creation
+        await FirebaseFirestore.instance.collection('servers').add({
+          'name': chatName,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
       Navigator.pop(context);
     }
   }
