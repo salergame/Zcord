@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'notifications_page.dart';
 import 'settings_page.dart';
+import 'create_chat_page.dart'; // Import the CreateChatPage
 
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
@@ -69,8 +70,24 @@ class HomePageState extends State<HomePage> {
   }
 }
 
-class MessagesListPage extends StatelessWidget {
+class MessagesListPage extends StatefulWidget {
   const MessagesListPage({super.key});
+
+  @override
+  State<MessagesListPage> createState() => _MessagesListPageState();
+}
+
+class _MessagesListPageState extends State<MessagesListPage> {
+  final List<Map<String, String>> _chats = [
+    {'id': 'group_1', 'title': 'Group 1', 'type': 'group'},
+    {'id': 'user_2', 'title': 'User 2', 'type': 'user'},
+  ];
+
+  void _addChat(String id, String title, String type) {
+    setState(() {
+      _chats.add({'id': id, 'title': title, 'type': type});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +118,14 @@ class MessagesListPage extends StatelessWidget {
                   ),
                 const SizedBox(height: 16),
                 FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateChatPage(onCreateChat: _addChat),
+                      ),
+                    );
+                  },
                   backgroundColor: Colors.grey[700],
                   child: const Icon(Icons.add, color: Colors.white),
                 ),
@@ -120,7 +144,7 @@ class MessagesListPage extends StatelessWidget {
                     children: [
                       const Expanded(
                         child: Text(
-                          'Messages',
+                          'Сообщения',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -132,7 +156,7 @@ class MessagesListPage extends StatelessWidget {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: const Color(0xFF4a5568),
-                            hintText: 'Search...',
+                            hintText: 'Поиск',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                               borderSide: BorderSide.none,
@@ -148,12 +172,9 @@ class MessagesListPage extends StatelessWidget {
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.all(8),
-                    itemCount: 10,
+                    itemCount: _chats.length,
                     itemBuilder: (context, index) {
-                      final isGroup = index % 2 == 0;
-                      final title = isGroup ? 'Group ${index + 1}' : 'User ${index + 1}';
-                      final chatId = isGroup ? 'group_${index + 1}' : 'user_${index + 1}';
-
+                      final chat = _chats[index];
                       return Card(
                         color: const Color(0xFF2d3748),
                         shape: RoundedRectangleBorder(
@@ -164,23 +185,28 @@ class MessagesListPage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MessagesPage(chatId: chatId, title: title),
+                                builder: (context) => MessagesPage(
+                                  chatId: chat['id']!,
+                                  title: chat['title']!,
+                                ),
                               ),
                             );
                           },
                           leading: CircleAvatar(
                             backgroundImage: NetworkImage(
-                              isGroup
+                              chat['type'] == 'group'
                                   ? 'https://storage.googleapis.com/a1aa/image/EYKK0hAYWErCGltuUVoYkhoYjfQDslTNLKpS8yO9Yu8D148JA.jpg'
                                   : 'https://storage.googleapis.com/a1aa/image/DEQoePJ5qpXxJiMN9lRz3WzNyBUOMj0fSNYdsPwVA9PGqx5TA.jpg',
                             ),
                           ),
                           title: Text(
-                            title,
+                            chat['title']!,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            isGroup ? 'Last message from group' : 'Last message from user',
+                            chat['type'] == 'group'
+                                ? 'Last message from group'
+                                : 'Last message from user',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -188,16 +214,11 @@ class MessagesListPage extends StatelessWidget {
                       );
                     },
                   ),
-                )
+                ),
               ],
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Colors.red,
-        child: const Icon(Icons.person_add, color: Colors.white),
       ),
     );
   }
@@ -322,4 +343,3 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 }
-

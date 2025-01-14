@@ -12,6 +12,7 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   String? userEmail;
+  String? userName; // To store the user's nickname
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ImagePicker _imagePicker = ImagePicker();
   File? _profileImage;
@@ -28,6 +29,7 @@ class _AccountPageState extends State<AccountPage> {
       if (user != null) {
         setState(() {
           userEmail = user.email; // Set user's email
+          userName = user.displayName ?? ""; // Set user's display name (if available)
         });
       }
     } catch (e) {
@@ -45,6 +47,36 @@ class _AccountPageState extends State<AccountPage> {
       }
     } catch (e) {
       print("Error picking image: $e");
+    }
+  }
+
+  Future<void> _saveChanges() async {
+    try {
+      // Logic to save changes (e.g., update Firebase user profile or Firestore)
+      User? user = _auth.currentUser;
+      if (user != null) {
+        await user.updateDisplayName(userName); // Update the user's display name
+        if (_profileImage != null) {
+          // Upload the profile image to Firebase Storage (placeholder)
+          // Example: Upload file to Firebase Storage and update user's profile photo URL
+        }
+        // Show a success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Изменения были сохранены.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error saving changes: $e");
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Не удалось сохранить изменения.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -102,18 +134,18 @@ class _AccountPageState extends State<AccountPage> {
             const SizedBox(height: 20),
             _buildTextField(
               label: 'Имя пользователя',
-              hint: 'Ваше имя пользователя',
+              hint: userName ?? 'Ваше имя пользователя',
               icon: Icons.person,
               onChanged: (value) {
-                // Handle nickname update
+                setState(() {
+                  userName = value; // Update userName on change
+                });
               },
             ),
             const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  // Handle save changes action
-                },
+                onPressed: _saveChanges, // Save changes action
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[500],
                   padding:
