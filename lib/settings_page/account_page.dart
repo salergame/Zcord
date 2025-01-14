@@ -92,7 +92,7 @@ class _AccountPageState extends State<AccountPage> {
             const SizedBox(height: 20),
             _buildTextField(
               label: 'Почтовый адрес',
-              hint: userEmail ?? 'Loading...', // Display user's email or a loading state
+              hint: userEmail ?? 'Загрузка...', // Display user's email or a loading state
               icon: Icons.email,
               onChanged: (value) {
                 // Email is read-only in this example

@@ -56,7 +56,20 @@ class _MyAppState extends State<Zcord> {
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
       locale: context.locale,
-      home: const ZCordLoginPage(), // Login page as the home page
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasData) {
+            return const ChatPage();
+          } else {
+            return const ZCordLoginPage();
+          }
+        },
+      ),
     );
   }
 }
@@ -71,42 +84,27 @@ class ZCordLoginPage extends StatefulWidget {
 class ZCordLoginPageState extends State<ZCordLoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void _signIn() async {
-    // Show the loading animation while signing in
     showDialog(
       context: context,
       builder: (context) => const Center(child: DiscordLoadingAnimation()),
-      barrierDismissible: false, // Prevent dismissing the dialog manually
+      barrierDismissible: false,
     );
 
     try {
-      // Attempt to sign in the user
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Close the loading dialog
       if (!mounted) return;
       Navigator.pop(context);
-
-      // Navigate to the chat page upon successful login
-      if (userCredential.user != null) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const ChatPage()),
-              (route) => false, // Remove all previous routes
-        );
-      }
     } on FirebaseAuthException catch (e) {
-      // Close the loading dialog in case of error
       if (!mounted) return;
       Navigator.pop(context);
 
-      // Display appropriate error messages
       if (e.code == 'user-not-found') {
         _showErrorDialog(tr('user_not_found'));
       } else if (e.code == 'wrong-password') {
@@ -119,9 +117,8 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
         _showErrorDialog(tr('unexpected_error'));
       }
     } catch (e) {
-      // Handle unexpected errors
       if (!mounted) return;
-      Navigator.pop(context); // Dismiss the dialog
+      Navigator.pop(context);
       _showErrorDialog(tr('unexpected_error'));
     }
   }
@@ -134,7 +131,7 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
         content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // Close the dialog
+            onPressed: () => Navigator.pop(context),
             child: const Text('OK'),
           ),
         ],
@@ -282,3 +279,4 @@ class ZCordLoginPageState extends State<ZCordLoginPage> {
     );
   }
 }
+

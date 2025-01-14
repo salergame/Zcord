@@ -1,4 +1,3 @@
-// TODO: infinite loading after re-logging out
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../main.dart'; // Import the main.dart file for redirection
