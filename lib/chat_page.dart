@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'notifications_page.dart';
 import 'settings_page.dart';
-import 'create_chat_page.dart'; // Import the new CreateChatPage
+import 'create_chat_page.dart';
 
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
@@ -90,16 +90,7 @@ class MessagesListPage extends StatelessWidget {
                   radius: 20,
                 ),
                 const SizedBox(height: 16),
-                for (int i = 0; i < 7; i++)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/a1aa/image/DEQoePJ5qpXxJiMN9lRz3WzNyBUOMj0fSNYdsPwVA9PGqx5TA.jpg',
-                      ),
-                      radius: 20,
-                    ),
-                  ),
+                // Additional items or logic for real servers can be added here
                 const SizedBox(height: 16),
                 FloatingActionButton(
                   onPressed: () {
