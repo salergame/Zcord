@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
 import 'settings_page/account_page.dart';
+import 'settings_page/authorized_apps_page.dart';
+import 'settings_page/friend_requests_page.dart';
+import 'settings_page/qr_code_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -72,7 +75,12 @@ class SettingsPage extends StatelessWidget {
             SettingsItem(
               icon: Icons.key,
               title: 'Авторизованные приложения',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthorizedAppsPage()),
+                );
+              },
             ),
             SettingsItem(
               icon: Icons.devices,
@@ -82,12 +90,22 @@ class SettingsPage extends StatelessWidget {
             SettingsItem(
               icon: Icons.person_add,
               title: 'Заявки в друзья',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FriendRequestsPage()),
+                );
+              },
             ),
             SettingsItem(
               icon: Icons.qr_code,
               title: 'Сканирование QR Кода',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const QRCodePage()),
+                );
+              },
             ),
             const SizedBox(height: 20),
             // Billing Settings Section
