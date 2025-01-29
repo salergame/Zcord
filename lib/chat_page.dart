@@ -389,12 +389,12 @@ class _MessagesListPageState extends State<MessagesListPage> {
                       ),
                     ),
                   ),
-                const SizedBox(height: 16),
-                FloatingActionButton(
-                  onPressed: _createEntity,
-                  backgroundColor: Colors.grey[700],
-                  child: const Icon(Icons.add, color: Colors.white),
-                ),
+                  const SizedBox(height: 16),
+                  FloatingActionButton(
+                    onPressed: _createEntity,
+                    backgroundColor: Colors.grey[700],
+                    child: const Icon(Icons.add, color: Colors.white),
+                  ),
               ],
             ),
           ),
@@ -557,7 +557,14 @@ class _MessagesPageState extends State<MessagesPage> {
       try {
         User? currentUser = FirebaseAuth.instance.currentUser;
         if (currentUser != null) {
-          // Create messages subcollection
+          // Get user data including avatar
+          DocumentSnapshot userDoc = await _firestore
+              .collection('users')
+              .doc(currentUser.uid)
+              .get();
+          
+          final userData = userDoc.data() as Map<String, dynamic>?;
+          
           await _firestore
               .collection('chats')
               .doc(widget.chatId)
@@ -565,6 +572,8 @@ class _MessagesPageState extends State<MessagesPage> {
               .add({
             'senderId': currentUser.uid,
             'senderNickname': _currentUserNickname,
+            'senderAvatar': userData?['avatarUrl'],
+            'default_avatar': userData?['avatarUrl'] == null ? true : null, // Track if using default
             'text': _messageController.text.trim(),
             'timestamp': FieldValue.serverTimestamp(),
           });
@@ -933,15 +942,43 @@ class _MessagesPageState extends State<MessagesPage> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundColor: isCurrentUser ? Colors.blue : Colors.green,
-                                child: Text(
-                                  (message['senderNickname'] ?? 'U')[0].toUpperCase(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                      child: Container(
+                                        width: 200,
+                                        height: 200,
+                                        decoration: BoxDecoration(
+                                          color: Colors.transparent,
+                                          image: DecorationImage(
+                                            image: message['senderAvatar'] != null
+                                                ? NetworkImage(message['senderAvatar'])
+                                                : AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius: BorderRadius.circular(100),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: isCurrentUser ? Colors.blue : Colors.green,
+                                  backgroundImage: message['senderAvatar'] != null
+                                      ? NetworkImage(message['senderAvatar'])
+                                      : AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                                  child: (message['senderAvatar'] == null && message['default_avatar'] == null)
+                                      ? Text(
+                                          (message['senderNickname'] ?? 'U')[0].toUpperCase(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        )
+                                      : null,
                                 ),
                               ),
                               const SizedBox(width: 12),

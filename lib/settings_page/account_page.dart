@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -16,6 +18,7 @@ class _AccountPageState extends State<AccountPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ImagePicker _imagePicker = ImagePicker();
   File? _profileImage;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -52,15 +55,22 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _saveChanges() async {
     try {
-      // Logic to save changes (e.g., update Firebase user profile or Firestore)
       User? user = _auth.currentUser;
       if (user != null) {
-        await user.updateDisplayName(userName); // Update the user's display name
+        await user.updateDisplayName(userName);
+        
         if (_profileImage != null) {
-          // Upload the profile image to Firebase Storage (placeholder)
-          // Example: Upload file to Firebase Storage and update user's profile photo URL
+          // Convert image file to base64 string
+          final bytes = await _profileImage!.readAsBytes();
+          final base64Image = base64Encode(bytes);
+          
+          // Save to Firestore
+          await _firestore.collection('users').doc(user.uid).set({
+            'profileImage': base64Image,
+            'userName': userName,
+          }, SetOptions(merge: true));
         }
-        // Show a success message
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Изменения были сохранены.'),
@@ -70,7 +80,6 @@ class _AccountPageState extends State<AccountPage> {
       }
     } catch (e) {
       print("Error saving changes: $e");
-      // Show an error message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Не удалось сохранить изменения.'),

@@ -10,6 +10,9 @@
         android:label="zcord"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="io.agora.rtc.appid"
+            android:value="43473c32f2d34edda79c9bf75ce6a909" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
