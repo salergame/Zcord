@@ -8,10 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'dart:convert';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:share_plus/share_plus.dart'; // using any other image handlers crashes the app on launch
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'package:permission_handler/permission_handler.dart';
+import 'dart:io'; 
 
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});
@@ -814,47 +813,6 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
-  Future<bool> _requestStoragePermission() async {
-    if (await Permission.storage.request().isGranted) {
-      return true;
-    }
-    return false;
-  }
-
-  Future<void> _saveImageToGallery(String base64Image) async {
-    if (await _requestStoragePermission()) {
-      try {
-        final bytes = base64Decode(base64Image);
-        final tempDir = await getTemporaryDirectory();
-        final tempFile = File('${tempDir.path}/temp_image.jpg');
-        await tempFile.writeAsBytes(bytes);
-
-        final result = await GallerySaver.saveImage(tempFile.path);
-        if (result ?? false) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Image saved to gallery')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to save image')),
-          );
-        }
-
-        // Clean up temp file
-        await tempFile.delete();
-      } catch (e) {
-        print('Error saving image: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save image')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission denied')),
-      );
-    }
-  }
-
   void _showImageOptions(String base64Image) {
     showModalBottomSheet(
       context: context,
@@ -867,21 +825,30 @@ class _MessagesPageState extends State<MessagesPage> {
         children: [
           ListTile(
             leading: const Icon(Icons.save_alt, color: Colors.white),
-            title: const Text('Save to Gallery', style: TextStyle(color: Colors.white)),
+            title: const Text('Save/Share Image', style: TextStyle(color: Colors.white)),
             onTap: () async {
               Navigator.pop(context);
-              await _saveImageToGallery(base64Image);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.copy, color: Colors.white),
-            title: const Text('Copy Image', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              // Since image clipboard isn't supported, show a message
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Image copying not supported yet')),
-              );
+              try {
+                final bytes = base64Decode(base64Image);
+                final tempDir = await getTemporaryDirectory();
+                final file = File('${tempDir.path}/zcord_${DateTime.now().millisecondsSinceEpoch}.jpg');
+                await file.writeAsBytes(bytes);
+                
+                await Share.shareXFiles(
+                  [XFile(file.path)],
+                  text: 'Image from Zcord',
+                ).then((_) async {
+                  // Clean up temp file after sharing
+                  if (await file.exists()) {
+                    await file.delete();
+                  }
+                });
+              } catch (e) {
+                print('Error handling image: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to handle image')),
+                );
+              }
             },
           ),
         ],
