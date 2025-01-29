@@ -1,46 +1,108 @@
 import 'dart:io';
+import 'dart:convert';
 
 class WebSocketConnection {
   late WebSocket _socket;
+  Function(Map<String, dynamic>)? onMessageCallback;
+  bool isConnected = false;
+  
+  // Add debug mode
+  final bool debugMode;
+  
+  WebSocketConnection({this.debugMode = false});
 
   Future<void> connect(String url) async {
     try {
+      if (debugMode) print('Attempting to connect to: $url');
+      
       _socket = await WebSocket.connect(url);
-      ('WebSocket connected to: $url');
+      isConnected = true;
+      
+      if (debugMode) print('WebSocket connected successfully to: $url');
 
-      // Listen for incoming messages and errors
-      _socket.listen((data) {
-        onMessage(data);
-      }, onError: onError, onDone: onClose);
+      _socket.listen(
+        (data) {
+          if (debugMode) print('Received raw data: $data');
+          _handleMessage(data);
+        },
+        onError: (error) {
+          if (debugMode) print('WebSocket error: $error');
+          _handleError(error);
+        },
+        onDone: () {
+          if (debugMode) print('WebSocket connection closed');
+          _handleClose();
+        },
+      );
     } catch (e) {
-      ('WebSocket connection failed: $e');
+      if (debugMode) print('WebSocket connection failed: $e');
+      isConnected = false;
+      rethrow;
     }
   }
 
-  void onMessage(dynamic message) {
-    // Log received message
-    ('Received message: $message');
-  }
-
-  void sendMessage(String message) {
-    if (_socket.readyState == WebSocket.open) {
-      _socket.add(message);
-      ('Sent message: $message');
-    } else {
-      ('WebSocket is not open. Message not sent.');
+  void _handleMessage(dynamic data) {
+    try {
+      final message = json.decode(data.toString());
+      if (debugMode) print('Parsed message: $message');
+      onMessageCallback?.call(message);
+    } catch (e) {
+      if (debugMode) print('Error parsing message: $e');
     }
   }
 
-  void onClose() {
-    ('WebSocket connection closed.');
+  void _handleError(error) {
+    print('WebSocket error: $error');
+    isConnected = false;
   }
 
-  void onError(error) {
-    ('WebSocket error: $error');
+  void _handleClose() {
+    print('WebSocket connection closed');
+    isConnected = false;
+  }
+
+  void sendMessage({
+    required String chatId,
+    required String senderId,
+    required String senderNickname,
+    required String text,
+  }) {
+    if (!isConnected) {
+      if (debugMode) print('Cannot send message: WebSocket is not connected');
+      return;
+    }
+
+    final message = {
+      'type': 'chat_message',
+      'chatId': chatId,
+      'senderId': senderId,
+      'senderNickname': senderNickname,
+      'text': text,
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+
+    if (debugMode) print('Sending message: $message');
+    _socket.add(json.encode(message));
+  }
+
+  // Add test method
+  Future<void> testConnection() async {
+    if (!isConnected) {
+      throw Exception('WebSocket is not connected');
+    }
+
+    final testMessage = {
+      'type': 'test_message',
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+
+    if (debugMode) print('Sending test message: $testMessage');
+    _socket.add(json.encode(testMessage));
   }
 
   void close() {
+    if (debugMode) print('Closing WebSocket connection');
     _socket.close();
-    ('WebSocket connection closed manually.');
+    isConnected = false;
   }
 }

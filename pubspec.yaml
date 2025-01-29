@@ -16,13 +16,12 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   easy_localization: ^3.0.7
-  http: ^1.2.2
+  http: 0.13.6
   cupertino_icons: ^1.0.8
   awesome_dialog: ^3.2.1
   cloud_firestore: ^5.6.2
   shared_preferences: ^2.3.5
   image_picker: ^1.1.2
-  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:
