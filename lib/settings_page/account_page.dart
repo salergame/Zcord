@@ -19,7 +19,6 @@ class _AccountPageState extends State<AccountPage> {
   final ImagePicker _imagePicker = ImagePicker();
   File? _profileImage;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  bool _notificationsEnabled = true;
   final TextEditingController _currentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -27,12 +26,13 @@ class _AccountPageState extends State<AccountPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _emailPasswordController = TextEditingController();
   ImageProvider? _cachedProfileImage;
+  late Future<void> _initDataFuture;
 
   @override
   void initState() {
     super.initState();
+    _initDataFuture = _getUserData();
     _loadCachedImage();
-    _getUserData();
   }
 
   Future<void> _loadCachedImage() async {
@@ -497,114 +497,116 @@ class _AccountPageState extends State<AccountPage> {
           style: TextStyle(color: Colors.red[500]),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: _cachedProfileImage ??
-                        (_profileImage != null
-                            ? FileImage(_profileImage!)
-                            : const AssetImage('assets/default_avatar.png') as ImageProvider),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
+      body: FutureBuilder(
+        future: _initDataFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.red,
+              ),
+            );
+          }
+          
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: GestureDetector(
+                      onTap: _pickImage,
                       child: CircleAvatar(
-                        backgroundColor: Colors.red[500],
-                        radius: 15,
-                        child: const Icon(Icons.edit, size: 16, color: Colors.white),
+                        radius: 50,
+                        backgroundImage: _cachedProfileImage ??
+                            (_profileImage != null
+                                ? FileImage(_profileImage!)
+                                : const AssetImage('assets/default_avatar.png') as ImageProvider),
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.red[500],
+                            radius: 15,
+                            child: const Icon(Icons.edit, size: 16, color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Информация об аккаунте section
-              _buildSectionTitle('Информация об аккаунте'),
-              _buildInfoTile(
-                'Никнейм',
-                userName ?? 'Не указано',
-                Icons.person,
-                onTap: () => _showNicknameDialog(),
-              ),
-              _buildInfoTile(
-                'Электронная почта',
-                userEmail ?? 'Не указано',
-                Icons.email,
-                onTap: _showChangeEmailDialog,
-              ),
-              _buildInfoTile(
-                'Телефон',
-                '+XXXXXXXXXX',
-                Icons.phone,
-                onTap: () {
-                  // Handle phone edit
-                },
-              ),
-              _buildActionTile(
-                'Изменить пароль',
-                'Изменить пароль учетной записи',
-                Icons.lock,
-                _showChangePasswordDialog,
-              ),
+                  // Информация об аккаунте section
+                  _buildSectionTitle('Информация об аккаунте'),
+                  _buildInfoTile(
+                    'Никнейм',
+                    userName ?? 'Не указано',
+                    Icons.person,
+                    onTap: () => _showNicknameDialog(),
+                  ),
+                  _buildInfoTile(
+                    'Электронная почта',
+                    userEmail ?? 'Не указано',
+                    Icons.email,
+                    onTap: _showChangeEmailDialog,
+                  ),
+                  _buildInfoTile(
+                    'Телефон',
+                    '+XXXXXXXXXX',
+                    Icons.phone,
+                    onTap: () {
+                      // Handle phone edit
+                    },
+                  ),
+                  _buildActionTile(
+                    'Изменить пароль',
+                    'Изменить пароль учетной записи',
+                    Icons.lock,
+                    _showChangePasswordDialog,
+                  ),
 
-              const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
-              // Настройки приложения секция
-              _buildSectionTitle('Настройки приложения'),
-              _buildSwitchTile(
-                'Уведомления',
-                'Получать push-уведомления',
-                Icons.notifications,
-                _notificationsEnabled,
-                (value) => setState(() => _notificationsEnabled = value),
-              ),
-              const SizedBox(height: 30),
+                  // Управление аккаунтом section
+                  _buildSectionTitle('Управление аккаунтом'),
+                  _buildActionTile(
+                    'Деактивировать аккаунт',
+                    'Временно отключить доступ к аккаунту',
+                    Icons.pause_circle_outline,
+                    _disableAccount,
+                  ),
+                  _buildActionTile(
+                    'Удалить аккаунт',
+                    'Навсегда удалить ваш аккаунт',
+                    Icons.delete_forever,
+                    _deleteAccount,
+                    isDestructive: true,
+                  ),
 
-              // Управление аккаунтом section
-              _buildSectionTitle('Управление аккаунтом'),
-              _buildActionTile(
-                'Деактивировать аккаунт',
-                'Временно отключить доступ к аккаунту',
-                Icons.pause_circle_outline,
-                _disableAccount,
-              ),
-              _buildActionTile(
-                'Удалить аккаунт',
-                'Навсегда удалить ваш аккаунт',
-                Icons.delete_forever,
-                _deleteAccount,
-                isDestructive: true,
-              ),
+                  const SizedBox(height: 30),
 
-              const SizedBox(height: 30),
-
-              Center(
-                child: ElevatedButton(
-                  onPressed: _saveChanges,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[500],
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _saveChanges,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red[500],
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Сохранить изменения',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    'Сохранить изменения',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+                  const SizedBox(height: 20),
+                ],
               ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -634,26 +636,24 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  Widget _buildSwitchTile(
+  Widget _buildInfoTile(
     String title,
-    String subtitle,
-    IconData icon,
-    bool value,
-    Function(bool) onChanged,
-  ) {
+    String value,
+    IconData icon, {
+    required VoidCallback onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: const Color(0xFF4A5568),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: SwitchListTile(
+      child: ListTile(
+        leading: Icon(icon, color: Colors.red[500]),
         title: Text(title, style: const TextStyle(color: Colors.white)),
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
-        secondary: Icon(icon, color: Colors.red[500]),
-        value: value,
-        onChanged: onChanged,
-        activeColor: Colors.red[500],
+        subtitle: Text(value, style: const TextStyle(color: Colors.grey)),
+        trailing: Icon(Icons.arrow_forward_ios, color: Colors.red[500], size: 16),
+        onTap: onTap,
       ),
     );
   }
@@ -672,37 +672,25 @@ class _AccountPageState extends State<AccountPage> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
-        leading: Icon(icon, color: isDestructive ? Colors.red : Colors.red[500]),
+        leading: Icon(
+          icon,
+          color: isDestructive ? Colors.red : Colors.red[500],
+        ),
         title: Text(
           title,
           style: TextStyle(
             color: isDestructive ? Colors.red : Colors.white,
           ),
         ),
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.red[500], size: 16),
-        onTap: onTap,
-      ),
-    );
-  }
-
-  Widget _buildInfoTile(
-    String title,
-    String value,
-    IconData icon, {
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4A5568),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.red[500]),
-        title: Text(title, style: const TextStyle(color: Colors.white)),
-        subtitle: Text(value, style: const TextStyle(color: Colors.grey)),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.red[500], size: 16),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(color: Colors.grey),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.red[500],
+          size: 16,
+        ),
         onTap: onTap,
       ),
     );
