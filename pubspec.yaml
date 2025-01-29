@@ -15,12 +15,19 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   easy_localization: ^3.0.7
-  http: ^1.2.2
+  http: 0.13.6
   cupertino_icons: ^1.0.8
   awesome_dialog: ^3.2.1
   cloud_firestore: ^5.6.1
   shared_preferences: ^2.3.5
   image_picker: ^1.1.2
+  shelf: ^1.4.1
+  shelf_web_socket: ^1.0.4
+  intl: ^0.19.0
+  emoji_picker_flutter: ^4.3.0
+  gallery_saver: ^2.3.2
+  path_provider: ^2.0.15
+  permission_handler: ^11.0.0
 
 dev_dependencies:
   flutter_test:
