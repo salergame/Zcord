@@ -66,9 +66,9 @@ class _AccountPageState extends State<AccountPage> {
           userEmail = user.email;
           if (userData.exists) {
             final data = userData.data();
-            if (data != null && data['userName'] != null) {
-              userName = data['userName'];
-              _nicknameController.text = data['userName'];
+            if (data != null && data['nickname'] != null) {
+              userName = data['nickname'];
+              _nicknameController.text = data['nickname'];
             }
           }
         });
@@ -125,7 +125,7 @@ class _AccountPageState extends State<AccountPage> {
           // Save to Firestore
           await _firestore.collection('users').doc(user.uid).set({
             'profileImage': base64Image,
-            'userName': userName,
+            'nickname': userName,
           }, SetOptions(merge: true));
         }
 

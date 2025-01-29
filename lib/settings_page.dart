@@ -5,6 +5,8 @@ import 'settings_page/account_page.dart';
 import 'settings_page/authorized_apps_page.dart';
 import 'settings_page/friend_requests_page.dart';
 import 'settings_page/qr_code_page.dart';
+import 'settings_page/privacy_security_page.dart';
+import 'settings_page/devices_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -70,7 +72,12 @@ class SettingsPage extends StatelessWidget {
             SettingsItem(
               icon: Icons.shield,
               title: 'Конфиденциальность и безопасность',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PrivacySecurityPage()),
+                );
+              },
             ),
             SettingsItem(
               icon: Icons.key,
@@ -85,7 +92,12 @@ class SettingsPage extends StatelessWidget {
             SettingsItem(
               icon: Icons.devices,
               title: 'Устройства',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DevicesPage()),
+                );
+              },
             ),
             SettingsItem(
               icon: Icons.person_add,

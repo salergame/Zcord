@@ -8,7 +8,6 @@ class PrivacySecurityPage extends StatefulWidget {
 }
 
 class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
-  bool _twoFactorEnabled = false;
   bool _showOnlineStatus = true;
   bool _allowDirectMessages = true;
   bool _allowFriendRequests = true;
@@ -33,15 +32,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader('Безопасность'),
-              _buildSwitchTile(
-                'Двухфакторная аутентификация',
-                'Дополнительный уровень безопасности для вашего аккаунта',
-                _twoFactorEnabled,
-                (value) => setState(() => _twoFactorEnabled = value),
-              ),
-              _buildPasswordButton(),
-              
               _buildSectionHeader('Приватность'),
               _buildSwitchTile(
                 'Закрытый профиль',
@@ -108,79 +98,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           color: Colors.grey,
           fontSize: 16,
           fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPasswordButton() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4A5568),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: InkWell(
-        onTap: () {
-          // Добавить логику изменения пароля
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              backgroundColor: const Color(0xFF4A5568),
-              title: const Text(
-                'Изменить пароль',
-                style: TextStyle(color: Colors.white),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Текущий пароль',
-                      labelStyle: TextStyle(color: Colors.grey),
-                    ),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  TextField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Новый пароль',
-                      labelStyle: TextStyle(color: Colors.grey),
-                    ),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Отмена'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // Добавить логику сохранения пароля
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'Сохранить',
-                    style: TextStyle(color: Colors.red[500]),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Изменить пароль',
-              style: TextStyle(color: Colors.white),
-            ),
-            Icon(Icons.arrow_forward_ios, color: Colors.red[500], size: 16),
-          ],
         ),
       ),
     );
