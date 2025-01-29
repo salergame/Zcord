@@ -47,3 +47,5 @@ flutter:
     - assets/zcord_logo.png
     - assets/lang/
     - assets/default_avatar.png
+    # or if you're using a subdirectory:
+    # - assets/images/default_avatar.png

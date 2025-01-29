@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'notifications_page.dart';
+import 'users_list_page.dart';
 import 'settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'server_options_menu.dart';
@@ -104,12 +105,15 @@ class _MessagesListPageState extends State<MessagesListPage> {
         .snapshots()
         .listen((snapshot) {
       setState(() {
-        _servers = snapshot.docs.map((doc) => {
-          'id': doc.id,
-          'name': doc['name'],
-          'image': doc['image'],
-          'description': doc['description'],
-          'ownerId': doc['ownerId'],
+        _servers = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'id': doc.id,
+            'name': data['name'] ?? '',
+            'image': data['image'] ?? '',
+            'description': data['description'] ?? '',
+            'ownerId': data['ownerId'] ?? '',
+          };
         }).toList();
       });
     });
@@ -121,12 +125,15 @@ class _MessagesListPageState extends State<MessagesListPage> {
         .snapshots()
         .listen((snapshot) {
       setState(() {
-        _groups = snapshot.docs.map((doc) => {
-          'id': doc.id,
-          'name': doc['name'],
-          'image': doc['image'],
-          'description': doc['description'],
-          'ownerId': doc['ownerId'],
+        _groups = snapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'id': doc.id,
+            'name': data['name'] ?? '',
+            'image': data['image'] ?? '',
+            'description': data['description'] ?? '',
+            'ownerId': data['ownerId'] ?? '',
+          };
         }).toList();
       });
     });
@@ -1176,94 +1183,6 @@ class _MessagesPageState extends State<MessagesPage> {
     } else {
       return DateFormat('MM/dd/yyyy').format(date);
     }
-  }
-}
-
-Stream<QuerySnapshot> getUsers() {
-  return FirebaseFirestore.instance.collection('users').snapshots();
-}
-
-class UsersListPage extends StatelessWidget {
-  const UsersListPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Direct Messages'),
-        backgroundColor: const Color(0xFF2D3748),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .where('uid', isNotEqualTo: FirebaseAuth.instance.currentUser?.uid)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final users = snapshot.data!.docs;
-
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index].data() as Map<String, dynamic>;
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: user['photoUrl'] != null
-                      ? NetworkImage(user['photoUrl'])
-                      : null,
-                  child: user['photoUrl'] == null
-                      ? Text(user['nickname']?[0] ?? 'U')
-                      : null,
-                ),
-                title: Text(user['nickname'] ?? 'Unknown User'),
-                subtitle: Text(user['status'] ?? 'Online'),
-                onTap: () => _startChat(context, users[index].id, user['nickname']),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  void _startChat(BuildContext context, String userId, String userName) {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      final chatId = _getChatId(currentUser.uid, userId);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MessagesPage(
-            chatId: chatId,
-            title: Text(userName),
-          ),
-        ),
-      );
-    }
-  }
-
-  String _getChatId(String uid1, String uid2) {
-    // Ensure consistent chat ID regardless of who initiates
-    return uid1.compareTo(uid2) < 0 ? '$uid1-$uid2' : '$uid2-$uid1';
-  }
-}
-
-Future<void> createChatRoom(String chatId, String participantId) async {
-  final chatRef = FirebaseFirestore.instance.collection('chats').doc(chatId);
-  final chatSnapshot = await chatRef.get();
-
-  if (!chatSnapshot.exists) {
-    await chatRef.set({
-      'participants': [FirebaseAuth.instance.currentUser!.uid, participantId],
-      'createdAt': FieldValue.serverTimestamp(),
-    });
   }
 }
 

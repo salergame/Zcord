@@ -66,14 +66,14 @@ class _AccountPageState extends State<AccountPage> {
           userEmail = user.email;
           if (userData.exists) {
             final data = userData.data();
-            if (data != null && data['nickname'] != null) {
-              userName = data['nickname'];
-              _nicknameController.text = data['nickname'];
+            if (data != null) {
+              userName = data['nickname'] ?? '';
+              _nicknameController.text = data['nickname'] ?? '';
             }
           }
         });
 
-        // Handle profile image
+        // Handle profile image if it exists
         if (userData.exists) {
           final data = userData.data();
           if (data != null && data['profileImage'] != null) {
@@ -84,7 +84,6 @@ class _AccountPageState extends State<AccountPage> {
             
             setState(() {
               _profileImage = tempFile;
-              _cachedProfileImage = MemoryImage(bytes);
             });
           }
         }
@@ -115,19 +114,13 @@ class _AccountPageState extends State<AccountPage> {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
-        await user.updateDisplayName(userName);
-        
-        if (_profileImage != null) {
-          // Convert image file to base64 string
-          final bytes = await _profileImage!.readAsBytes();
-          final base64Image = base64Encode(bytes);
-          
-          // Save to Firestore
-          await _firestore.collection('users').doc(user.uid).set({
-            'profileImage': base64Image,
-            'nickname': userName,
-          }, SetOptions(merge: true));
-        }
+        // Save to Firestore with all necessary fields
+        await _firestore.collection('users').doc(user.uid).set({
+          'nickname': userName,
+          'email': user.email,
+          'uid': user.uid,  // Add uid field
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -204,50 +197,45 @@ class _AccountPageState extends State<AccountPage> {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
-        // Reauthenticate user first
-        AuthCredential credential = EmailAuthProvider.credential(
-          email: user.email!,
-          password: _emailPasswordController.text,
-        );
-
-        await user.reauthenticateWithCredential(credential);
-        await user.updateEmail(_emailController.text);
-
-        // Update state and clear controllers
-        setState(() {
-          userEmail = _emailController.text;
-        });
-        _emailController.clear();
-        _emailPasswordController.clear();
-
-        Navigator.pop(context);
+        // Send verification email to new address
+        await user.verifyBeforeUpdateEmail(_emailController.text.trim());
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Электронная почта успешно изменена'),
-            duration: Duration(seconds: 2),
+            content: Text('Письмо с подтверждением отправлено на новый адрес электронной почты.'),
+            duration: Duration(seconds: 3),
           ),
         );
+
+        setState(() {
+          userEmail = _emailController.text.trim();
+        });
+
+        Navigator.pop(context); // Close the dialog
       }
-    } catch (e) {
-      String errorMessage = 'Произошла ошибка при смене почты';
-      if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'wrong-password':
-            errorMessage = 'Неверный пароль';
-            break;
-          case 'email-already-in-use':
-            errorMessage = 'Эта почта уже используется';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Неверный формат электронной почты';
-            break;
-        }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case 'invalid-email':
+          errorMessage = 'Неверный формат электронной почты.';
+          break;
+        case 'email-already-in-use':
+          errorMessage = 'Этот адрес электронной почты уже используется.';
+          break;
+        case 'requires-recent-login':
+          errorMessage = 'Пожалуйста, выполните повторный вход для изменения email.';
+          // You might want to implement reauthentication here
+          break;
+        default:
+          errorMessage = 'Произошла ошибка при изменении email.';
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          duration: const Duration(seconds: 2),
+        SnackBar(content: Text(errorMessage)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Произошла ошибка при изменении email.'),
         ),
       );
     }
@@ -727,11 +715,13 @@ class _AccountPageState extends State<AccountPage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              setState(() {
-                userName = _nicknameController.text;
-              });
-              await _saveChanges();
-              if (mounted) Navigator.pop(context);
+              if (_nicknameController.text.isNotEmpty) {
+                setState(() {
+                  userName = _nicknameController.text;
+                });
+                await _saveChanges();
+                if (mounted) Navigator.pop(context);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[500],
