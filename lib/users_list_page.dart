@@ -1,102 +1,148 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'chat/messages_page.dart';
 import 'dart:convert';
+import 'package:zcord/chat/messages_page.dart';
 
-class UsersListPage extends StatelessWidget {
+class UsersListPage extends StatefulWidget {
   const UsersListPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final currentUser = FirebaseAuth.instance.currentUser;
+  State<UsersListPage> createState() => _UsersListPageState();
+}
+
+class _UsersListPageState extends State<UsersListPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Widget _buildUserAvatar(String? avatarUrl, String nickname) {
+    final isUrl = avatarUrl != null && 
+                 (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://'));
+    final isBase64 = avatarUrl != null && !isUrl;
     
-    if (currentUser == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Text(
-            'Пожалуйста, войдите в систему',
-            style: TextStyle(color: Colors.white),
+    ImageProvider? getAvatarImage() {
+      if (avatarUrl == null || avatarUrl.isEmpty) return null;
+      if (isUrl) return NetworkImage(avatarUrl);
+      if (isBase64) {
+        try {
+          return MemoryImage(base64Decode(avatarUrl));
+        } catch (e) {
+          print('Error decoding base64 avatar: $e');
+          return null;
+        }
+      }
+      return null;
+    }
+
+    return CircleAvatar(
+      backgroundColor: Colors.blue,
+      backgroundImage: getAvatarImage(),
+      child: getAvatarImage() == null
+          ? Text(
+              nickname.isNotEmpty ? nickname[0].toUpperCase() : 'U',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          : null,
+    );
+  }
+
+  Future<void> _createOrNavigateToChat(BuildContext context, String userId, String nickname) async {
+    try {
+      // Create a unique chat ID
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) return;
+
+      final chatId = [currentUser.uid, userId]..sort();
+      final chatDocId = chatId.join('_');
+
+      // Check if chat already exists
+      final chatDoc = await _firestore.collection('chats').doc(chatDocId).get();
+
+      if (!chatDoc.exists) {
+        // Create new chat document
+        await _firestore.collection('chats').doc(chatDocId).set({
+          'members': chatId,
+          'lastMessage': '',
+          'lastMessageTime': FieldValue.serverTimestamp(),
+          'type': 'direct', // Add this to distinguish from group chats
+        });
+      }
+
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MessagesPage(
+            chatId: chatDocId,
+            chatName: nickname,
+            isGroup: false,
+            title: Text(nickname),
           ),
         ),
       );
+    } catch (e) {
+      print('Error creating/navigating to chat: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to open chat')),
+      );
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF36393F),
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Личные сообщения',
-          style: TextStyle(color: Colors.red[500]),
-        ),
+        backgroundColor: const Color(0xFF2F3136),
+        title: const Text('Direct Messages'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .where(FieldPath.documentId, isNotEqualTo: currentUser.uid)
-            .snapshots(),
+        stream: _firestore.collection('users').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Ошибка: ${snapshot.error}'));
+            return const Center(child: Text('Something went wrong'));
           }
 
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator(color: Colors.red));
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final currentUser = _auth.currentUser;
+          if (currentUser == null) {
+            return const Center(child: Text('Not logged in'));
           }
 
           final users = snapshot.data!.docs
-              .where((doc) => doc.exists && doc.id != currentUser.uid)
+              .where((doc) => doc.id != currentUser.uid)
+              .map((doc) => doc.data() as Map<String, dynamic>)
               .toList();
-
-          if (users.isEmpty) {
-            return const Center(
-              child: Text(
-                'Нет доступных пользователей',
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          }
 
           return ListView.builder(
             itemCount: users.length,
             itemBuilder: (context, index) {
-              final userData = users[index].data() as Map<String, dynamic>;
-              final userId = users[index].id;
-
-              Widget avatarWidget;
-              try {
-                if (userData['profileImage'] != null) {
-                  final imageBytes = base64Decode(userData['profileImage']);
-                  avatarWidget = CircleAvatar(
-                    backgroundImage: MemoryImage(imageBytes),
-                    backgroundColor: Colors.red[500],
-                  );
-                } else {
-                  avatarWidget = CircleAvatar(
-                    backgroundColor: Colors.red[500],
-                    child: Text(
-                      (userData['nickname'] ?? 'U')[0].toUpperCase(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                }
-              } catch (e) {
-                avatarWidget = CircleAvatar(
-                  backgroundColor: Colors.red[500],
-                  child: Text(
-                    (userData['nickname'] ?? 'U')[0].toUpperCase(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                );
-              }
+              final userData = users[index];
+              final userId = snapshot.data!.docs
+                  .where((doc) => doc.id != currentUser.uid)
+                  .elementAt(index)
+                  .id;
+              
+              final avatarWidget = _buildUserAvatar(
+                userData['profileImage'] ?? userData['avatarUrl'] ?? userData['photoUrl'],
+                userData['nickname'] ?? 'Unknown User',
+              );
 
               return Container(
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 4.0,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A5568),
-                  borderRadius: BorderRadius.circular(8),
+                  color: const Color(0xFF2F3136),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: ListTile(
                   leading: avatarWidget,
@@ -105,10 +151,14 @@ class UsersListPage extends StatelessWidget {
                     style: const TextStyle(color: Colors.white),
                   ),
                   subtitle: Text(
-                    userData['status'] ?? 'В сети',
+                    userData['status'] ?? 'Online',
                     style: const TextStyle(color: Colors.grey),
                   ),
-                  onTap: () => _createOrNavigateToChat(context, userId, userData['nickname'] ?? 'Unknown User'),
+                  onTap: () => _createOrNavigateToChat(
+                    context,
+                    userId,
+                    userData['nickname'] ?? 'Unknown User',
+                  ),
                 ),
               );
             },
@@ -116,40 +166,5 @@ class UsersListPage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  void _createOrNavigateToChat(BuildContext context, String userId, String nickname) async {
-    try {
-      // Create a unique chat ID
-      final chatId = [FirebaseAuth.instance.currentUser!.uid, userId]..sort();
-      final chatDocId = chatId.join('_');
-
-      // Check if chat already exists
-      final chatDoc = await FirebaseFirestore.instance.collection('chats').doc(chatDocId).get();
-
-      if (!chatDoc.exists) {
-        // Create new chat document
-        await FirebaseFirestore.instance.collection('chats').doc(chatDocId).set({
-          'participants': chatId,
-          'createdAt': FieldValue.serverTimestamp(),
-          'lastMessage': '',
-          'lastMessageTime': FieldValue.serverTimestamp(),
-        });
-      }
-
-      // Navigate to chat
-      if (!context.mounted) return;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MessagesPage(
-            chatId: chatDocId,
-            title: Text(nickname, style: const TextStyle(color: Colors.white)),
-          ),
-        ),
-      );
-    } catch (e) {
-      print('Error creating/navigating to chat: $e');
-    }
   }
 } 

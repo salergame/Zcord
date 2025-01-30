@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'discord_loading_animation.dart'; // Import the loading animation widget
 import 'chat_page.dart'; // Import chat page
 import 'forgot_password.dart'; // Import forgot password page
 import 'reg.dart'; // Import registration page
+import 'call/call_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
   await EasyLocalization.ensureInitialized();
+  
+  // Initialize WebRTC
+  await WebRTC.initialize(options: {"enableHardwareAcceleration": true});
 
   runApp(EasyLocalization(
     supportedLocales: const [Locale('en'), Locale('ru')],
@@ -28,6 +33,12 @@ class Zcord extends StatefulWidget {
 }
 
 class _MyAppState extends State<Zcord> {
+  @override
+  void initState() {
+    super.initState();
+    CallService.listenForCalls(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

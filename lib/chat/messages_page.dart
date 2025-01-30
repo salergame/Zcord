@@ -8,14 +8,20 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:zcord/group_settings_page.dart';
+import '../call/video_call_screen.dart';
 
 class MessagesPage extends StatefulWidget {
   final String chatId;
+  final String chatName;
+  final bool isGroup;
   final Widget title;
 
   const MessagesPage({
     super.key,
     required this.chatId,
+    required this.chatName,
+    required this.isGroup,
     required this.title,
   });
 
@@ -55,16 +61,55 @@ class _MessagesPageState extends State<MessagesPage> {
         ),
         title: widget.title,
         actions: [
+          if (widget.isGroup)
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GroupSettingsPage(
+                      groupId: widget.chatId,
+                      groupName: widget.chatName,
+                    ),
+                  ),
+                );
+              },
+            ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.white),
             color: const Color(0xFF2F3136),
             onSelected: (value) {
               switch (value) {
                 case 'video':
-                  // Handle video call
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VideoCallScreen(
+                        chatId: widget.chatId,
+                        remoteUserId: widget.chatId.replaceAll(
+                          FirebaseAuth.instance.currentUser!.uid,
+                          '',
+                        ).replaceAll('_', ''),
+                        isVideo: true,
+                      ),
+                    ),
+                  );
                   break;
                 case 'voice':
-                  // Handle voice call
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VideoCallScreen(
+                        chatId: widget.chatId,
+                        remoteUserId: widget.chatId.replaceAll(
+                          FirebaseAuth.instance.currentUser!.uid,
+                          '',
+                        ).replaceAll('_', ''),
+                        isVideo: false,
+                      ),
+                    ),
+                  );
                   break;
                 case 'info':
                   // Handle user info
