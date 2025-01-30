@@ -206,31 +206,13 @@ class _MessagesListPageState extends State<MessagesListPage> {
     );
   }
 
-  void _onServerSelected(String serverId, String serverName) {
+  void _navigateToChat(String chatId, String title) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => MessagesPage(
-          chatId: serverId,
-          title: Text(
-            serverName,
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _onGroupSelected(String groupId, String groupName) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MessagesPage(
-          chatId: groupId,
-          title: Text(
-            groupName,
-            style: const TextStyle(color: Colors.white),
-          ),
+          chatId: chatId,
+          title: Text(title, style: const TextStyle(color: Colors.white)),
         ),
       ),
     );
@@ -339,7 +321,10 @@ class _MessagesListPageState extends State<MessagesListPage> {
           server['description'] ?? 'No description',
           style: const TextStyle(color: Colors.grey),
         ),
-        onTap: () => _onServerSelected(server['id'], server['name']),
+        onTap: () => _navigateToChat(
+          server['id'],
+          server['name'],
+        ),
       ),
     );
   }
@@ -360,7 +345,10 @@ class _MessagesListPageState extends State<MessagesListPage> {
           group['description'] ?? 'No description',
           style: const TextStyle(color: Colors.grey),
         ),
-        onTap: () => _onGroupSelected(group['id'], group['name']),
+        onTap: () => _navigateToChat(
+          group['id'],
+          group['name'],
+        ),
       ),
     );
   }

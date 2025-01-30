@@ -108,7 +108,7 @@ class UsersListPage extends StatelessWidget {
                     userData['status'] ?? 'В сети',
                     style: const TextStyle(color: Colors.grey),
                   ),
-                  onTap: () => _startChat(context, userId, userData['nickname'] ?? 'Unknown User'),
+                  onTap: () => _createOrNavigateToChat(context, userId, userData['nickname'] ?? 'Unknown User'),
                 ),
               );
             },
@@ -118,43 +118,38 @@ class UsersListPage extends StatelessWidget {
     );
   }
 
-  void _startChat(BuildContext context, String userId, String userName) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      final chatId = _getChatId(currentUser.uid, userId);
-      
-      // Create chat room if it doesn't exist
-      await _createChatRoom(chatId, userId);
+  void _createOrNavigateToChat(BuildContext context, String userId, String nickname) async {
+    try {
+      // Create a unique chat ID
+      final chatId = [FirebaseAuth.instance.currentUser!.uid, userId]..sort();
+      final chatDocId = chatId.join('_');
 
-      if (context.mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MessagesPage(
-              chatId: chatId,
-              title: Text(userName),
-            ),
-          ),
-        );
+      // Check if chat already exists
+      final chatDoc = await FirebaseFirestore.instance.collection('chats').doc(chatDocId).get();
+
+      if (!chatDoc.exists) {
+        // Create new chat document
+        await FirebaseFirestore.instance.collection('chats').doc(chatDocId).set({
+          'participants': chatId,
+          'createdAt': FieldValue.serverTimestamp(),
+          'lastMessage': '',
+          'lastMessageTime': FieldValue.serverTimestamp(),
+        });
       }
-    }
-  }
 
-  String _getChatId(String uid1, String uid2) {
-    return uid1.compareTo(uid2) < 0 ? '$uid1-$uid2' : '$uid2-$uid1';
-  }
-
-  Future<void> _createChatRoom(String chatId, String participantId) async {
-    final chatRef = FirebaseFirestore.instance.collection('chats').doc(chatId);
-    final chatSnapshot = await chatRef.get();
-
-    if (!chatSnapshot.exists) {
-      await chatRef.set({
-        'participants': [FirebaseAuth.instance.currentUser!.uid, participantId],
-        'createdAt': FieldValue.serverTimestamp(),
-        'lastMessage': '',
-        'lastMessageTime': FieldValue.serverTimestamp(),
-      });
+      // Navigate to chat
+      if (!context.mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MessagesPage(
+            chatId: chatDocId,
+            title: Text(nickname, style: const TextStyle(color: Colors.white)),
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Error creating/navigating to chat: $e');
     }
   }
 } 
